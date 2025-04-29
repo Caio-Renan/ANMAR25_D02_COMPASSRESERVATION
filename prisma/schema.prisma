@@ -13,7 +13,7 @@ model User {
   email      String   @unique
   password   String
   phone      String   @unique
-  status     String   @default("active")
+  status     Status   @default("ACTIVE")
   createdAt  DateTime @default(now())
   updatedAt  DateTime? @updatedAt
 }
@@ -25,7 +25,7 @@ model Client {
   email           String    @unique
   phone           String    @unique
   birthDate       DateTime
-  status          String   @default("active")
+  status          Status   @default("ACTIVE")
   createdAt       DateTime  @default(now())
   updatedAt       DateTime? @updatedAt
   reservations    Reservation[] // <- relação com as reservas (Se quiser pode mudar o nome) - MS
@@ -63,6 +63,7 @@ enum ReservationStatus {
   CANCELED
 }
 
+<<<<<<< HEAD
 model Resource {
   id          Int       @id @default(autoincrement())
   name        String
@@ -74,3 +75,9 @@ model Resource {
 
   reservations ReservationResource[]
 }
+=======
+enum Status {
+  ACTIVE
+  INACTIVE
+}
+>>>>>>> 1e69e74363ad2a4ef8163e65d5d31d1834e6830c
