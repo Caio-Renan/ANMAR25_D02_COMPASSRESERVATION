@@ -1,5 +1,5 @@
 generator client {
-  provider = "prismasq-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -13,9 +13,9 @@ model User {
   email      String   @unique
   password   String
   phone      String   @unique
-  status     Status   @default("ACTIVE")
+  status     Status   @default(ACTIVE)
   createdAt  DateTime @default(now())
-  updatedAt  DateTime? @updatedAt
+  updatedAt  DateTime @updatedAt
 }
 
 model Client {
@@ -25,10 +25,23 @@ model Client {
   email           String    @unique
   phone           String    @unique
   birthDate       DateTime
-  status          Status   @default("ACTIVE")
+  status          Status   @default(ACTIVE)
   createdAt       DateTime  @default(now())
-  updatedAt       DateTime? @updatedAt
+  updatedAt       DateTime  @updatedAt
   reservations    Reservation[] // <- relação com as reservas (Se quiser pode mudar o nome) - MS
+}
+
+
+model Resource {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  description String?
+  quantity    Int
+  status      Status    @default(ACTIVE)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  reservations ReservationResource[]
 }
 
 model Reservation {
@@ -39,7 +52,7 @@ model Reservation {
   endDate   DateTime
   status    ReservationStatus @default(OPEN)
   createdAt DateTime          @default(now())
-  updatedAt DateTime?         @updatedAt
+  updatedAt DateTime         @updatedAt
   closedAt  DateTime?         
 
   client    Client                @relation(fields: [clientId], references: [id])
@@ -63,21 +76,9 @@ enum ReservationStatus {
   CANCELED
 }
 
-<<<<<<< HEAD
-model Resource {
-  id          Int       @id @default(autoincrement())
-  name        String
-  description String?
-  quantity    Int
-  status      String    @default("active")
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime? @updatedAt
-
-  reservations ReservationResource[]
-}
-=======
 enum Status {
   ACTIVE
   INACTIVE
 }
->>>>>>> 1e69e74363ad2a4ef8163e65d5d31d1834e6830c
+
+
