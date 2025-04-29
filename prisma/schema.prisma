@@ -27,7 +27,7 @@ model Client {
   birthDate       DateTime
   status          String   @default("active")
   createdAt       DateTime  @default(now())
-  updatedAt       DateTime? 
+  updatedAt       DateTime? @updatedAt
   reservations    Reservation[] // <- relação com as reservas (Se quiser pode mudar o nome) - MS
 }
 
@@ -39,8 +39,8 @@ model Reservation {
   endDate   DateTime
   status    ReservationStatus @default(OPEN)
   createdAt DateTime          @default(now())
-  updatedAt DateTime?
-  closedAt  DateTime?
+  updatedAt DateTime?         @updatedAt
+  closedAt  DateTime?         
 
   client    Client                @relation(fields: [clientId], references: [id])
   space     Space                 @relation(fields: [spaceId], references: [id])
