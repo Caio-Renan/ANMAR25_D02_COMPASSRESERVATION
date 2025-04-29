@@ -62,3 +62,15 @@ enum ReservationStatus {
   CLOSED
   CANCELED
 }
+
+model Resource {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String?
+  quantity    Int
+  status      String    @default("active")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime? @updatedAt
+
+  reservations ReservationResource[]
+}
