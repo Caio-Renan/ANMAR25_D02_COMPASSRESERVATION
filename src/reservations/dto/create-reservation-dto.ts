@@ -4,7 +4,6 @@ import {
   IsDate,
   IsInt,
   IsNotEmpty,
-  IsPhoneNumber,
   Min,
   ValidateNested,
 } from 'class-validator';
