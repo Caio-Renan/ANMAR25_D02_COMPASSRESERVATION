@@ -7,16 +7,6 @@ export class ReservationService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(data: CreateReservationDto) {
-     const transformedData = {
-          ...data,
-          resources: {
-            create: data.resources.map(resource => ({
-              resourceId: resource.resourceId,
-              quantity: resource.quantity,
-            })),
-          },
-        };
-      
-        return this.prisma.reservation.create({ data: transformedData });
+    return this.prisma.reservation.create({ data });
   }
 }
