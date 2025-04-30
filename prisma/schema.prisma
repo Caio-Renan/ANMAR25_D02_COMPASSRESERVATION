@@ -8,49 +8,48 @@ datasource db {
 }
 
 model User {
-  id         Int      @id @default(autoincrement())
-  name       String
-  email      String   @unique
-  password   String
-  phone      String   @unique
-  status     Status   @default(ACTIVE)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  phone     String   @unique
+  status    Status   @default(ACTIVE)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
+
 model Client {
-  id              Int       @id @default(autoincrement())
-  name            String
-  cpf             String    @unique
-  email           String    @unique
-  phone           String    @unique
-  birthDate       DateTime
-  status          Status   @default(ACTIVE)
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  reservations    Reservation[] 
+  id           Int           @id @default(autoincrement())
+  name         String
+  cpf          String        @unique
+  email        String        @unique
+  phone        String        @unique
+  birthDate    DateTime
+  status       Status        @default(ACTIVE)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  reservations Reservation[]
 }
 
 model Space {
-  id          Int      @id @default(autoincrement())
-  name        String @unique
-  description String
-  capacity    Int
-  status      Status @default(ACTIVE)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  reservations Reservation[] 
+  id           Int           @id @default(autoincrement())
+  name         String        @unique
+  description  String
+  capacity     Int
+  status       Status        @default(ACTIVE)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  reservations Reservation[]
 }
 
-
-
 model Resource {
-  id          Int       @id @default(autoincrement())
-  name        String    @unique
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
   description String?
   quantity    Int
-  status      Status    @default(ACTIVE)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  status      Status   @default(ACTIVE)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   reservations ReservationResource[]
 }
@@ -63,11 +62,11 @@ model Reservation {
   endDate   DateTime
   status    ReservationStatus @default(OPEN)
   createdAt DateTime          @default(now())
-  updatedAt DateTime         @updatedAt
-  closedAt  DateTime?         
+  updatedAt DateTime          @updatedAt
+  closedAt  DateTime?
 
-  client    Client                @relation(fields: [clientId], references: [id])
-  space     Space                 @relation(fields: [spaceId], references: [id])
+  client    Client            @relation(fields: [clientId], references: [id])
+  space     Space             @relation(fields: [spaceId], references: [id])
   resources ReservationResource[]
 }
 
@@ -92,5 +91,3 @@ enum Status {
   ACTIVE
   INACTIVE
 }
-
-
