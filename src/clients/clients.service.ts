@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
+import { Client } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateClientDto } from './dto/create-client.dto';
-import { Client } from '@prisma/client';
+import { UpdateClientDto } from './dto/update-client.dto';
 
 @Injectable()
 export class ClientsService {
@@ -19,6 +20,13 @@ export class ClientsService {
         birthDate,
         status,
       },
+    });
+  }
+
+  async update(id: number, updateClientDto: UpdateClientDto): Promise<Client> {
+    return this.prisma.client.update({
+      where: { id },
+      data: updateClientDto,
     });
   }
 }
