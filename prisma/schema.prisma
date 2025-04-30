@@ -75,6 +75,7 @@ model ReservationResource {
   id            Int @id @default(autoincrement())
   reservationId Int
   resourceId    Int
+  quantity      Int
 
   reservation Reservation @relation(fields: [reservationId], references: [id])
   resource    Resource    @relation(fields: [resourceId], references: [id])
