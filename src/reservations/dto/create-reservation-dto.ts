@@ -39,5 +39,5 @@ export class CreateReservationDto {
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CreateReservationResourceDto)
-  resources: CreateReservationResourceDto[];
+  resources: { create: CreateReservationResourceDto[] };
 }
