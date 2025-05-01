@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { ReservationService } from './reservations.service';
 import { CreateReservationDto } from './dto/create-reservation-dto';
+import { UpdateReservationDto } from './dto/update-reservation-dto';
 
 @Controller('reservations')
 export class ReservationController {
@@ -30,9 +31,12 @@ export class ReservationController {
     return this.reservationService.findOne(id);
   }
 
-  @Put('id')
-  async update(@Param() id: number) {
-    // return this.reservationService.update(id);
+  @Put(':id')
+  async update(
+    @Body() data: UpdateReservationDto,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.reservationService.update(id, data);
   }
 
   @Delete('id')
