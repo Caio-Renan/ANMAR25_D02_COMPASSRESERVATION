@@ -1,6 +1,6 @@
 
 import { Status } from "@prisma/client";
-import { IsEnum, IsInt, IsOptional, IsString, Min } from "class-validator";
+import { IsEnum, IsInt, IsNotEmpty, IsOptional, IsString, Min } from "class-validator";
 import { PartialType } from "@nestjs/mapped-types";
 import { createSpaceDto } from "./create-space-dto";
 
@@ -8,9 +8,10 @@ export class ListSpaceDto extends PartialType(createSpaceDto){
 
     @IsString()
     @IsOptional()
+    @IsNotEmpty()
     name?: string;
 
-    @IsString()
+    @IsInt()
     @IsOptional()
     @Min(1, { message: "Capacity must be at least 1" })
     capacity?: number;
@@ -21,6 +22,7 @@ export class ListSpaceDto extends PartialType(createSpaceDto){
 
     @IsInt()
     @IsOptional()
+    @Min(1, { message: 'Page must be a positive integer' })
     page?: number;
 
     @IsInt()

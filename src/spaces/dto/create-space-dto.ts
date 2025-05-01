@@ -1,11 +1,14 @@
-import { IsInt, IsString, Min } from "class-validator";
+import { IsInt, IsNotEmpty, IsString, Min } from "class-validator";
 
 
 export class createSpaceDto {
+
   @IsString()
+  @IsNotEmpty()
   name: string;
 
   @IsString()
+  @IsNotEmpty()
   description: string;
 
   @IsInt()
