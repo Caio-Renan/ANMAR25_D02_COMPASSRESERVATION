@@ -11,6 +11,7 @@ import {
 } from './dto/create-reservation-dto';
 import { ReservationValidationService } from './reservationsValidate.service';
 import { Reservation } from '@prisma/client';
+import { UpdateReservationDto } from './dto/update-reservation-dto';
 
 @Injectable()
 export class ReservationService {
@@ -69,6 +70,11 @@ export class ReservationService {
     return this.prisma.reservation.findUnique({
       where: { id },
     });
+  }
+
+  async update(id: number, data: UpdateReservationDto) {
+    await this.exists(id);
+    return this.prisma.reservation.update({ data, where: { id } });
   }
 
   async exists(id: number) {
