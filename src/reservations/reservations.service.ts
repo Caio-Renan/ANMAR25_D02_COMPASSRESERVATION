@@ -63,4 +63,17 @@ export class ReservationService {
   async findAll(): Promise<Reservation[]> {
     return this.prisma.reservation.findMany();
   }
+
+  async findOne(id: number): Promise<Reservation | null> {
+    await this.exists(id);
+    return this.prisma.reservation.findUnique({
+      where: { id },
+    });
+  }
+
+  async exists(id: number) {
+    if (!(await this.prisma.reservation.count({ where: { id } }))) {
+      throw new NotFoundException('reservation not found');
+    }
+  }
 }
