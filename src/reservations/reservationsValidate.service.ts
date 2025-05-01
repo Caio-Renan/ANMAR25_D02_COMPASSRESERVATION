@@ -1,6 +1,6 @@
 
 
-import { Injectable, NotAcceptableException, NotFoundException } from "@nestjs/common";
+import { ConflictException, Injectable, NotAcceptableException, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import { CreateReservationResourceDto } from "./dto/create-reservation-dto";
 
@@ -51,6 +51,16 @@ export class ReservationValidationService {
           }
 
           return true;
+     }
+
+     async verifyClient(clientId: number) {
+          const client = await this.prisma.client.findFirst({
+               where: { id: clientId }
+          })
+
+          if (!client) {
+               throw new NotFoundException('Client not found')
+          }
      }
 
 }
