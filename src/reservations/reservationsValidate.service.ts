@@ -34,4 +34,23 @@ export class ReservationValidationService {
           }
           return true;
      }
+
+     async isDateAvailable(spaceId: number, startDate: Date, endDate: Date): Promise<boolean> {
+          const conflictingReservations = await this.prisma.reservation.findFirst({
+               where: {
+                    spaceId,
+                    AND: [
+                         { startDate: { lt: endDate } },
+                         { endDate: { gt: startDate } },
+                    ],
+               },
+          });
+
+          if (conflictingReservations) {
+               throw new ConflictException('Date is not available');
+          }
+
+          return true;
+     }
+
 }
