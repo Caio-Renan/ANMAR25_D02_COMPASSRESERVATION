@@ -39,8 +39,8 @@ export class ReservationController {
     return this.reservationService.update(id, data);
   }
 
-  @Delete('id')
-  async delete(@Param() id: number) {
-    // return this.reservationService.delete(id);
+  @Delete(':id')
+  async delete(@Param('id', ParseIntPipe) id: number) {
+    return this.reservationService.delete(id);
   }
 }
