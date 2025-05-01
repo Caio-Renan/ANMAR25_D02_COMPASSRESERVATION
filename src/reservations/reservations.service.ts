@@ -77,6 +77,11 @@ export class ReservationService {
     return this.prisma.reservation.update({ data, where: { id } });
   }
 
+  async delete(id: number) {
+    await this.exists(id);
+    return this.prisma.reservation.delete({ where: { id } });
+  }
+
   async exists(id: number) {
     if (!(await this.prisma.reservation.count({ where: { id } }))) {
       throw new NotFoundException('reservation not found');
