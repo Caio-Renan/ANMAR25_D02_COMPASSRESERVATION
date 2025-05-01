@@ -1,4 +1,12 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { ReservationService } from './reservations.service';
 import { CreateReservationDto } from './dto/create-reservation-dto';
 
@@ -13,7 +21,7 @@ export class ReservationController {
 
   @Get()
   async findAll() {
-    //return this.reservationService.findAll();
+    return this.reservationService.findAll();
   }
 
   @Get('id')
@@ -23,11 +31,11 @@ export class ReservationController {
 
   @Put('id')
   async update(@Param() id: number) {
-   // return this.reservationService.update(id);
+    // return this.reservationService.update(id);
   }
 
   @Delete('id')
   async delete(@Param() id: number) {
-   // return this.reservationService.delete(id);
+    // return this.reservationService.delete(id);
   }
 }
