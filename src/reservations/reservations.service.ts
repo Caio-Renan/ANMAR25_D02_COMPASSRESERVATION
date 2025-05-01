@@ -1,12 +1,58 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateReservationDto } from './dto/create-reservation-dto';
+import { ConflictException, Injectable, NotAcceptableException, NotFoundException } from "@nestjs/common";
+import { PrismaService } from "src/prisma/prisma.service";
+import { CreateReservationDto, CreateReservationResourceDto } from "./dto/create-reservation-dto"
+import { ReservationValidationService } from "./reservationsValidate.service";
+
 
 @Injectable()
 export class ReservationService {
-  constructor(private readonly prisma: PrismaService) {}
+     constructor(
+          private readonly prisma: PrismaService,
+          private readonly validationService: ReservationValidationService,
+     ) { }
 
-  async create(data: CreateReservationDto) {
-    return this.prisma.reservation.create({ data });
-  }
+     async create({
+          spaceId,
+          clientId,
+          endDate,
+          startDate,
+          resources
+     }: CreateReservationDto) {
+
+          if (!resources || !Array.isArray(resources.create)) {
+               throw new NotAcceptableException('Invalid resources format');
+          }
+
+          const isSpaceActive = await this.validationService.isSpaceActive(spaceId);
+
+          if (!isSpaceActive) {
+               throw new NotFoundException('Space not found or is inactive')
+          }
+
+          const resourceArray = resources.create;
+
+          await this.validationService.isResourceActiveAndEnough(resourceArray)
+
+          await this.validationService.isDateAvailable(spaceId, startDate, endDate);
+
+          await this.validationService.verifyClient(clientId);
+
+          await this.validationService.updateQuantity(resourceArray);
+
+          return this.prisma.reservation.create({
+               data: {
+                    clientId,
+                    spaceId,
+                    startDate,
+                    endDate,
+                    status: 'OPEN',
+                    resources: {
+                         create: resourceArray,
+                    },
+
+               },
+          });
+     }
+
+
 }
