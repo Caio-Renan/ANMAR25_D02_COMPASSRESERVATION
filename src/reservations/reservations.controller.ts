@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Post,
   Put,
 } from '@nestjs/common';
@@ -24,9 +25,9 @@ export class ReservationController {
     return this.reservationService.findAll();
   }
 
-  @Get('id')
-  async findOne(@Param() id: number) {
-    //return this.reservationService.findOne(id);
+  @Get(':id')
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.reservationService.findOne(id);
   }
 
   @Put('id')
