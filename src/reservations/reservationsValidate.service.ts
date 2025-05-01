@@ -63,4 +63,15 @@ export class ReservationValidationService {
           }
      }
 
+     async updateQuantity(resources: CreateReservationResourceDto[]) {
+          await Promise.all(
+               resources.map(({ resourceId, quantity }) => {
+                    this.prisma.resource.update({
+                         where: { id: resourceId },
+                         data: { quantity: { decrement: quantity } },
+                    })
+               })
+          );
+     }
+
 }
