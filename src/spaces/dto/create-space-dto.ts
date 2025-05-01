@@ -12,6 +12,6 @@ export class createSpaceDto {
   description: string;
 
   @IsInt()
-  @Min(1)
+  @Min(1, { message: "Capacity must be at least 1" })
   capacity: number;
 }
