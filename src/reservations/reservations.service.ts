@@ -1,58 +1,66 @@
-import { ConflictException, Injectable, NotAcceptableException, NotFoundException } from "@nestjs/common";
-import { PrismaService } from "src/prisma/prisma.service";
-import { CreateReservationDto, CreateReservationResourceDto } from "./dto/create-reservation-dto"
-import { ReservationValidationService } from "./reservationsValidate.service";
-
+import {
+  ConflictException,
+  Injectable,
+  NotAcceptableException,
+  NotFoundException,
+} from '@nestjs/common';
+import { PrismaService } from 'src/prisma/prisma.service';
+import {
+  CreateReservationDto,
+  CreateReservationResourceDto,
+} from './dto/create-reservation-dto';
+import { ReservationValidationService } from './reservationsValidate.service';
+import { Reservation } from '@prisma/client';
 
 @Injectable()
 export class ReservationService {
-     constructor(
-          private readonly prisma: PrismaService,
-          private readonly validationService: ReservationValidationService,
-     ) { }
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly validationService: ReservationValidationService,
+  ) {}
 
-     async create({
-          spaceId,
-          clientId,
-          endDate,
-          startDate,
-          resources
-     }: CreateReservationDto) {
+  async create({
+    spaceId,
+    clientId,
+    endDate,
+    startDate,
+    resources,
+  }: CreateReservationDto) {
+    if (!resources || !Array.isArray(resources.create)) {
+      throw new NotAcceptableException('Invalid resources format');
+    }
 
-          if (!resources || !Array.isArray(resources.create)) {
-               throw new NotAcceptableException('Invalid resources format');
-          }
+    const isSpaceActive = await this.validationService.isSpaceActive(spaceId);
 
-          const isSpaceActive = await this.validationService.isSpaceActive(spaceId);
+    if (!isSpaceActive) {
+      throw new NotFoundException('Space not found or is inactive');
+    }
 
-          if (!isSpaceActive) {
-               throw new NotFoundException('Space not found or is inactive')
-          }
+    const resourceArray = resources.create;
 
-          const resourceArray = resources.create;
+    await this.validationService.isResourceActiveAndEnough(resourceArray);
 
-          await this.validationService.isResourceActiveAndEnough(resourceArray)
+    await this.validationService.isDateAvailable(spaceId, startDate, endDate);
 
-          await this.validationService.isDateAvailable(spaceId, startDate, endDate);
+    await this.validationService.verifyClient(clientId);
 
-          await this.validationService.verifyClient(clientId);
+    await this.validationService.updateQuantity(resourceArray);
 
-          await this.validationService.updateQuantity(resourceArray);
+    return this.prisma.reservation.create({
+      data: {
+        clientId,
+        spaceId,
+        startDate,
+        endDate,
+        status: 'OPEN',
+        resources: {
+          create: resourceArray,
+        },
+      },
+    });
+  }
 
-          return this.prisma.reservation.create({
-               data: {
-                    clientId,
-                    spaceId,
-                    startDate,
-                    endDate,
-                    status: 'OPEN',
-                    resources: {
-                         create: resourceArray,
-                    },
-
-               },
-          });
-     }
-
-
+  async findAll(): Promise<Reservation[]> {
+    return this.prisma.reservation.findMany();
+  }
 }
