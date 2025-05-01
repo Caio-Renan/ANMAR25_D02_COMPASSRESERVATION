@@ -1,6 +1,8 @@
 import { IsOptional, IsString, IsInt, Min } from "class-validator";
+import { createSpaceDto } from "./create-space-dto";
+import { PartialType } from "@nestjs/mapped-types";
 
-export class updateSpaceDto {
+export class updateSpaceDto extends PartialType (createSpaceDto) {
   
   @IsString()
   @IsOptional()

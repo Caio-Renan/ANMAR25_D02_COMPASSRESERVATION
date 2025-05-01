@@ -1,7 +1,10 @@
-import { Status } from "../../common/enums/status.enum";    
-import { IsEnum, IsInt, IsOptional, IsString, Min } from "class-validator";
 
-export class listSpaceDto{
+import { Status } from "@prisma/client";
+import { IsEnum, IsInt, IsOptional, IsString, Min } from "class-validator";
+import { PartialType } from "@nestjs/mapped-types";
+import { createSpaceDto } from "./create-space-dto";
+
+export class ListSpaceDto extends PartialType(createSpaceDto){
 
     @IsString()
     @IsOptional()
@@ -25,3 +28,5 @@ export class listSpaceDto{
     pageSize?: number;
 
 }
+
+

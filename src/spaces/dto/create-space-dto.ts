@@ -1,7 +1,7 @@
 import { IsInt, IsString, Min } from "class-validator";
 
 
-export class createBaseDto {
+export class createSpaceDto {
   @IsString()
   name: string;
 
