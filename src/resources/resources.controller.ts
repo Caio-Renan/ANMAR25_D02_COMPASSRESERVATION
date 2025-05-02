@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put } from '@nestjs/common';
 import { ResourcesService } from './resources.service';
 
 @Controller('resources')
@@ -20,7 +20,7 @@ export class ResourcesController {
     return this.resourcesService.findOne(id);
   }
 
-  @Put(':id')
+  @Patch(':id')
   async update(@Body() data: Partial<{ name: string; quantity: number; description: string }>, @Param('id') id: number) {
     return this.resourcesService.update(id, data);
   }
