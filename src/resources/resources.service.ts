@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException, BadRequestException, } from '@nestjs/common';
 
 export interface Resource {
   id: number;
@@ -6,6 +6,7 @@ export interface Resource {
   quantity: number;
   description: string;
   createdAt: Date;
+  updatedAt: Date;
   status: string;
 }
 
@@ -18,7 +19,7 @@ export class ResourcesService {
 
     const existingResource = this.resources.find(resource => resource.name === name);
     if (existingResource) {
-      throw new Error('Resource name must be unique');
+      throw new ConflictException('resource already registered');
     }
 
     const newResource: Resource = {
@@ -27,6 +28,7 @@ export class ResourcesService {
       quantity,
       description,
       createdAt: new Date(),
+      updatedAt: new Date(),
       status: 'active',
     };
 
