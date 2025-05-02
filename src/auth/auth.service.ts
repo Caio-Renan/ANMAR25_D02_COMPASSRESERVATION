@@ -39,18 +39,6 @@ export class AuthService {
           };
      }
 
-     private createResetPasswordToken(userId: number) {
-          return this.jwtService.sign(
-               { id: userId },
-               {
-                    expiresIn: '1 hour',
-                    subject: String(userId),
-                    issuer: this.issuer,
-                    audience: this.audience,
-               }
-          )
-     }
-
 
      async login(dto: AuthLoginDto) {
           const user = await this.prisma.user.findFirst({
