@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotAcceptableException,
@@ -10,7 +11,7 @@ import {
   CreateReservationResourceDto,
 } from './dto/create-reservation-dto';
 import { ReservationValidationService } from './reservationsValidate.service';
-import { Reservation } from '@prisma/client';
+import { Prisma, Reservation } from '@prisma/client';
 import { UpdateReservationDto } from './dto/update-reservation-dto';
 
 @Injectable()
@@ -73,13 +74,62 @@ export class ReservationService {
   }
 
   async update(id: number, data: UpdateReservationDto) {
-    await this.exists(id);
-    return this.prisma.reservation.update({ data, where: { id } });
+    const reservation = await this.findOne(id);
+
+    if (!reservation) {
+      throw new NotFoundException('reservation not found');
+    }
+
+    if (data.status == 'CANCELED') {
+      throw new BadRequestException(
+        'Changing status to canceled when editing is not allowed',
+      );
+    }
+
+    if (data.status === 'APPROVED') {
+      if (reservation.status != 'OPEN') {
+        throw new BadRequestException(
+          'Only reservations with "open" status can be approved',
+        );
+      }
+    }
+
+    if (data.status === 'CLOSED') {
+      if (reservation.status !== 'APPROVED') {
+        throw new BadRequestException(
+          'It is only possible to close reservations with "approved" status',
+        );
+      }
+    }
+
+    const newData: Prisma.ReservationUpdateInput = {
+      startDate: data.startDate,
+      endDate: data.endDate,
+    };
+
+    newData.closedAt = new Date();
+
+    return this.prisma.reservation.update({ where: { id }, data: newData });
   }
 
-  async delete(id: number) {
-    await this.exists(id);
-    return this.prisma.reservation.delete({ where: { id } });
+  async softDelete(id: number) {
+    const reservation = await this.findOne(id);
+
+    if (!reservation) {
+      throw new NotFoundException('reservation not found');
+    }
+
+    if (reservation?.status !== 'OPEN') {
+      throw new BadRequestException(
+        'It is only possible to cancel reservations with "open" status',
+      );
+    }
+
+    const newData = { ...reservation };
+    newData.status = 'CANCELED';
+    newData.updatedAt = new Date();
+
+    await this.prisma.reservation.update({ where: { id }, data: newData });
   }
 
   async exists(id: number) {
