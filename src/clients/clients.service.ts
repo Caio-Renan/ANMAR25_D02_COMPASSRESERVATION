@@ -1,42 +1,137 @@
-import { Injectable } from '@nestjs/common';
-import { Client } from '@prisma/client';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  ConflictException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { Prisma, Client } from '@prisma/client';
 import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
+import { FilterClientDto } from './dto/filter-client.dto';
+import { getPaginationParams, buildPaginatedResponse } from '../common/utils/pagination.util';
+
+const clientSelect: Prisma.ClientSelect = {
+  id: true,
+  name: true,
+  cpf: true,
+  email: true,
+  phone: true,
+  birthDate: true,
+  status: true,
+  createdAt: true,
+  updatedAt: true,
+};
 
 @Injectable()
 export class ClientsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(createClientDto: CreateClientDto): Promise<Client> {
-    const { name, cpf, email, phone, birthDate, status } = createClientDto;
+  async create(dto: CreateClientDto): Promise<Client> {
+    const existingCpf = await this.prisma.client.findUnique({ where: { cpf: dto.cpf } });
+    if (existingCpf) throw new ConflictException('CPF already registered');
+
+    const existingEmail = await this.prisma.client.findUnique({ where: { email: dto.email } });
+    if (existingEmail) throw new ConflictException('Email already registered');
+
+    const existingPhone = await this.prisma.client.findUnique({ where: { phone: dto.phone } });
+    if (existingPhone) throw new ConflictException('Phone already registered');
 
     return this.prisma.client.create({
       data: {
-        name,
-        cpf,
-        email,
-        phone,
-        birthDate,
-        status,
+        ...dto,
+        status: 'ACTIVE',
       },
+      select: clientSelect,
     });
   }
 
-  async findAll(): Promise<Client[]> {
-    return this.prisma.client.findMany();
-  }
+  async update(id: number, dto: UpdateClientDto): Promise<Client> {
+    await this.isIdValueCorrect(id);
+    const client = await this.checkIfClientExists(id);
 
-  async findOne(id: number): Promise<Client | null> {
-    return this.prisma.client.findUnique({
-      where: { id },
-    });
-  }
+    if (dto.email && dto.email !== client.email) {
+      const emailExists = await this.prisma.client.findUnique({ where: { email: dto.email } });
+      if (emailExists) throw new ConflictException('Email already registered');
+    }
 
-  async update(id: number, updateClientDto: UpdateClientDto): Promise<Client> {
+    if (dto.phone && dto.phone !== client.phone) {
+      const phoneExists = await this.prisma.client.findUnique({ where: { phone: dto.phone } });
+      if (phoneExists) throw new ConflictException('Phone already registered');
+    }
+
+    if (dto.cpf && dto.cpf !== client.cpf) {
+      const cpfExists = await this.prisma.client.findUnique({ where: { cpf: dto.cpf } });
+      if (cpfExists) throw new ConflictException('CPF already registered');
+    }
+
     return this.prisma.client.update({
       where: { id },
-      data: updateClientDto,
+      data: {
+        ...dto,
+        updatedAt: new Date(),
+      },
+      select: clientSelect,
     });
+  }
+
+  async findAll(filter: FilterClientDto) {
+    const page = parseInt(filter.page?.toString() || '1', 10);
+    const limit = parseInt(filter.limit?.toString() || '10', 10);
+    const { skip, take } = getPaginationParams({ page, limit });
+
+    const where: Prisma.ClientWhereInput = {};
+
+    if (filter.name) where.name = { contains: filter.name };
+    if (filter.email) where.email = { contains: filter.email };
+    if (filter.status) where.status = filter.status;
+
+    const [data, total] = await Promise.all([
+      this.prisma.client.findMany({
+        where,
+        skip,
+        take,
+        select: clientSelect,
+      }),
+      this.prisma.client.count({ where }),
+    ]);
+
+    return buildPaginatedResponse(data, total, page, limit);
+  }
+
+  async findById(id: number) {
+    await this.isIdValueCorrect(id);
+    return this.checkIfClientExists(id, clientSelect);
+  }
+
+  async softDelete(id: number) {
+    await this.isIdValueCorrect(id);
+    const client = await this.checkIfClientExists(id);
+
+    if (client.status === 'INACTIVE') {
+      throw new ConflictException('Client already INACTIVE');
+    }
+
+    return this.prisma.client.update({
+      where: { id },
+      data: {
+        status: 'INACTIVE',
+        updatedAt: new Date(),
+      },
+      select: clientSelect,
+    });
+  }
+
+  async isIdValueCorrect(id: number) {
+    if (Number.isNaN(id)) throw new BadRequestException('ID must be a number');
+    if (id < 1) throw new BadRequestException('ID must be at least 1');
+  }
+
+  async checkIfClientExists(id: number, select?: Prisma.ClientSelect): Promise<Client> {
+    const client = await this.prisma.client.findUnique({ where: { id }, select });
+
+    if (!client) throw new NotFoundException('Client not found');
+
+    return client;
   }
 }
