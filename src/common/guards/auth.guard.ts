@@ -1,11 +1,13 @@
 import { BadRequestException, CanActivate, ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
+import { PrismaService } from "src/prisma/prisma.service";
 
 @Injectable()
 export class AuthGuard implements CanActivate {
 
      constructor(
           private readonly jwtService: JwtService,
+          private readonly prisma: PrismaService,
      ) { }
 
      async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -19,6 +21,10 @@ export class AuthGuard implements CanActivate {
 
           try {
                const payload = this.jwtService.verify(token);
+               const user = await this.prisma.user.findUnique({ where: { id: payload.id } });
+               if (!user || user.status !== 'ACTIVE') {
+                    throw new UnauthorizedException('User is inactive or does not exist');
+               }
                request.user = payload;
                return true;
           } catch (error) {
