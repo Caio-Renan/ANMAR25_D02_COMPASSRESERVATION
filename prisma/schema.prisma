@@ -49,7 +49,7 @@ model Resource {
   quantity    Int
   status      Status   @default(ACTIVE)
   createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  updatedAt   DateTime @updatedAt()
 
   reservations ReservationResource[]
 }
