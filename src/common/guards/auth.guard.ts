@@ -1,4 +1,4 @@
-import { BadRequestException, CanActivate, ExecutionContext, Injectable } from "@nestjs/common";
+import { BadRequestException, CanActivate, ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { Observable } from "rxjs";
 import { AuthService } from "src/auth/auth.service";
@@ -14,18 +14,25 @@ export class AuthGuard implements CanActivate {
 
      async canActivate(context: ExecutionContext): Promise<boolean> {
           const request = context.switchToHttp().getRequest();
-          const token = request.headers.authorization?.split(' ')[1];
+          const authHeader = request.headers.authorization
 
+          const token = authHeader.split(' ')[1];
           if (!token) {
-               return false;
+               throw new BadRequestException('Token is missing or malformed');
           }
 
           try {
                const payload = this.jwtService.verify(token);
                request.user = payload;
                return true;
-          } catch(error) {
-               return false;
+          } catch (error) {
+               if (error.name === 'TokenExpiredError') {
+                    throw new UnauthorizedException('Token has expired');
+               } else if (error.name === 'JsonWebTokenError') {
+                    throw new UnauthorizedException('Invalid token');
+               } else {
+                    throw new UnauthorizedException('Could not validate token');
+               }
           }
 
 
