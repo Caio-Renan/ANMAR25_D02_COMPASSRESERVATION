@@ -13,12 +13,12 @@ import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
   imports: [
     MailerModule.forRoot({
       transport: {
-        host: '',
+        host: 'smtp.gmail.com',
         port: 587,
         secure: false,
         auth: {
-          user: "username",
-          pass: "password",
+          user: process.env.MAIL_USER,
+          pass: process.env.MAIL_PASS,
         },
       },
       defaults: {
