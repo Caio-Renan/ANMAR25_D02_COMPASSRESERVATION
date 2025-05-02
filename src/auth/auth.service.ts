@@ -39,7 +39,7 @@ export class AuthService {
           };
      }
 
-     private createResetPasswordToken(userId: number){
+     private createResetPasswordToken(userId: number) {
           return this.jwtService.sign(
                { id: userId },
                {
@@ -87,16 +87,37 @@ export class AuthService {
           return this.createToken(user);
      }
 
-    /* async forget(dto: AuthForgetDto) {
-          const mail = await this.prisma.user.findUnique({
+     async forget(dto: AuthForgetDto) {
+          const user = await this.prisma.user.findFirst({
                where: { email: dto.email },
           });
 
-          if(!mail){
-               throw new NotFoundException('Email not found');
+          if (!user) {
+               throw new NotFoundException('Email is invalid');
           }
 
+          const token = this.jwtService.sign(
+               {
+                    id: user.id,
+               },
+               {
+                    expiresIn: '30 minutes',
+                    subject: String(user.id),
+                    issuer: 'forget',
+                    audience: 'users',
+               },
+          );
+
+          // await this.mailer.sendMail({
+          //   subject: 'Password Recovery',
+          //   to: user. email,
+          //   template: 'forget',
+          //   context: {
+          //     name: user.name,
+          //     token,
+          //   },
+          // });
+          // return true;
      }
-*/
 
 }
