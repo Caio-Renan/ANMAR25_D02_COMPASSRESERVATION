@@ -8,14 +8,17 @@ import * as bcrypt from 'bcrypt';
 import { AuthForgetDto } from "./dto/auth-forget.dto";
 import { User } from "@prisma/client";
 import { EmailService } from "src/email/email.service";
+import { AuthResetDto } from "./dto/auth-reset.dto";
 
 
 
 @Injectable()
 export class AuthService {
 
-     private issuer = 'login';
-     private audience = 'users';
+      private readonly jwtConfig = {
+          issuer: 'login',
+          audience: 'users',
+     }
 
      constructor(
           private readonly prisma: PrismaService,
@@ -35,25 +38,25 @@ export class AuthService {
                     {
                          expiresIn: '1 day',
                          subject: String(user.id),
-                         issuer: this.issuer,
-                         audience: this.audience,
+                         issuer: this.jwtConfig.issuer,
+                         audience: this.jwtConfig.audience,
                     },
                ),
           };
      }
 
-     private checkToken(token: string){
+     private checkForgetToken(token: string) {
           try {
                return this.jwtService.verify(token, {
-                    audience: this.audience,
-                    issuer: this.issuer,
+                    audience: 'users',
+                    issuer: 'forget',
                });
-          
+
           } catch (e) {
                throw new BadRequestException(e)
           }
      }
-     
+
      async login(dto: AuthLoginDto) {
           const user = await this.prisma.user.findFirst({
                where: {
@@ -108,7 +111,30 @@ export class AuthService {
 
           await this.emailService.sendPasswordRecovery(dto.email, token)
 
-          return  { message: 'Password recovery email sent successfully' };
+          return { message: 'Password recovery email sent successfully' };
+     }
+
+     async reset(dto: AuthResetDto) {
+          const payload = this.checkForgetToken(dto.token);
+
+          const userId = payload.id;
+
+          if (!userId) {
+               throw new BadRequestException('Token payload does not contain a valid user ID')
+          }
+
+          const user = await this.userService.findById(userId);
+
+          if (!user) {
+               throw new NotFoundException('No user found for the provided token')
+          }
+
+          const newPassword = await bcrypt.hash(dto.password, 10);
+
+          await this.userService.update(userId, { password: newPassword });
+
+          return { message: 'Password successfully updated' };
+
      }
 
 }
