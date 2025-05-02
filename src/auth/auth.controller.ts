@@ -1,8 +1,9 @@
-import { Body, Controller, Post } from "@nestjs/common";
+import { Body, Controller, Get, Post } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { AuthLoginDto } from "./dto/auth-login.dto";
 import { AuthForgetDto } from "./dto/auth-forget.dto";
 import { AuthRegisterDto } from "./dto/auth-register.dto";
+import { CurrentUser } from "src/common/decorators/current-user.decorator";
 
 
 @Controller()
@@ -19,6 +20,11 @@ export class AuthController {
      @Post('register')
      async register(@Body() dto: AuthRegisterDto) {
           return this.authService.register(dto);
+     }
+
+     @Get('me')
+     async getProfile(@CurrentUser() user: any) {
+          return user;
      }
 
      // @Post('forget')
