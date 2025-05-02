@@ -12,7 +12,7 @@ export class RolesGuard implements CanActivate {
           const requiredRoles = this.reflector.getAllAndOverride<Role[]>(ROLES_KEY, [context.getHandler(), context.getClass()])
 
           if (!requiredRoles || requiredRoles.length === 0) {
-               throw new ForbiddenException('Sem permissão definida.');
+               return true;
           }
 
           const { user } = context.switchToHttp().getRequest();
@@ -21,10 +21,10 @@ export class RolesGuard implements CanActivate {
                throw new ForbiddenException('Usuário não encontrado.');
           }
 
-          if (!requiredRoles.includes(user.role)) {
-               throw new ForbiddenException(`Role ${user.role} não autorizado.`);
+          const hasRole = requiredRoles.some((role) => user.role === role);
+          if (!hasRole) {
+               throw new ForbiddenException(`Usuário com role '${user.role}' não tem permissão para acessar esta rota.`);
           }
-
           return true;
      }
 }
