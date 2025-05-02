@@ -87,37 +87,37 @@ export class AuthService {
           return this.createToken(user);
      }
 
-     async forget(dto: AuthForgetDto) {
-          const user = await this.prisma.user.findFirst({
-               where: { email: dto.email },
-          });
+     // async forget(dto: AuthForgetDto) {
+     //      const user = await this.prisma.user.findFirst({
+     //           where: { email: dto.email },
+     //      });
 
-          if (!user) {
-               throw new NotFoundException('Email is invalid');
-          }
+     //      if (!user) {
+     //           throw new NotFoundException('Email is invalid');
+     //      }
 
-          const token = this.jwtService.sign(
-               {
-                    id: user.id,
-               },
-               {
-                    expiresIn: '30 minutes',
-                    subject: String(user.id),
-                    issuer: 'forget',
-                    audience: 'users',
-               },
-          );
+     //      const token = this.jwtService.sign(
+     //           {
+     //                id: user.id,
+     //           },
+     //           {
+     //                expiresIn: '30 minutes',
+     //                subject: String(user.id),
+     //                issuer: 'forget',
+     //                audience: 'users',
+     //           },
+     //      );
 
-          // await this.mailer.sendMail({
-          //   subject: 'Password Recovery',
-          //   to: user. email,
-          //   template: 'forget',
-          //   context: {
-          //     name: user.name,
-          //     token,
-          //   },
-          // });
-          // return true;
-     }
+     //      // await this.mailer.sendMail({
+     //      //   subject: 'Password Recovery',
+     //      //   to: user. email,
+     //      //   template: 'forget',
+     //      //   context: {
+     //      //     name: user.name,
+     //      //     token,
+     //      //   },
+     //      // });
+     //      // return true;
+     // }
 
 }
