@@ -4,7 +4,8 @@ import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
 
 
 @Module({
-     imports: [ MailerModule.forRoot({
+     imports: [ MailerModule.forRootAsync({
+          useFactory: () => ({
            transport: {
              host: 'smtp.gmail.com',
              port: 587,
@@ -24,7 +25,10 @@ import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
                strict: true,
              }
            }
-         }),],
+         })
+     })
+     ,
+],
      providers: [],
      exports: []
 })
