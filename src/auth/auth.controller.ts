@@ -4,6 +4,7 @@ import { AuthLoginDto } from "./dto/auth-login.dto";
 import { AuthForgetDto } from "./dto/auth-forget.dto";
 import { AuthRegisterDto } from "./dto/auth-register.dto";
 import { CurrentUser } from "src/common/decorators/current-user.decorator";
+import { AuthResetDto } from "./dto/auth-reset.dto";
 
 
 @Controller()
@@ -27,13 +28,13 @@ export class AuthController {
           return user;
      }
 
-     // @Post('forget')
-     // async forget(@Body() { email }: AuthForgetDto) {
-     //      return this.authService.forget({ email });
-     // }
+     @Post('forget')
+     async forget(@Body() dto: AuthForgetDto) {
+          return this.authService.forget(dto);
+     }
 
-     // @Post('reset')
-     // async reset(@Body() { password, token }) {
-     //      return this.authService.reset({ password, token });
-     // }
+     @Post('reset')
+     async reset(@Body() dto: AuthResetDto) {
+          return this.authService.reset(dto);
+     }
 }
