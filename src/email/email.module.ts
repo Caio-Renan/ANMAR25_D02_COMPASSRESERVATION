@@ -1,10 +1,12 @@
 import { MailerModule } from "@nestjs-modules/mailer";
 import { Module } from "@nestjs/common";
 import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
+import { EmailService } from "./email.service";
 
 
 @Module({
-     imports: [ MailerModule.forRootAsync({
+     imports: [ 
+          MailerModule.forRootAsync({
           useFactory: () => ({
            transport: {
              host: 'smtp.gmail.com',
@@ -26,11 +28,10 @@ import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
              }
            }
          })
-     })
-     ,
+     }),
 ],
-     providers: [],
-     exports: []
+     providers: [EmailService],
+     exports: [EmailService],
 })
 export class EmailModule {
      
