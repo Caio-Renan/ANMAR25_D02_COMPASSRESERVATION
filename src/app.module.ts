@@ -5,9 +5,16 @@ import { ReservationModule } from './reservations/reservations.module';
 import { UsersModule } from './users/users.module';
 import { SpacesModule } from './spaces/spaces.module';
 import { ClientsModule } from './clients/clients.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
-  imports: [ReservationModule, UsersModule, SpacesModule, ClientsModule],
+  imports: [
+    AuthModule,
+    ReservationModule, 
+    UsersModule, 
+    SpacesModule, 
+    ClientsModule
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
