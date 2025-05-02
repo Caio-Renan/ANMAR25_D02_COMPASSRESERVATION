@@ -6,6 +6,7 @@ import { AuthRegisterDto } from "./dto/auth-register.dto";
 import { AuthLoginDto } from "./dto/auth-login.dto";
 import * as bcrypt from 'bcrypt';
 import { AuthForgetDto } from "./dto/auth-forget.dto";
+import { User } from "@prisma/client";
 
 
 
@@ -21,7 +22,7 @@ export class AuthService {
           private readonly userService: UsersService,
      ) { }
 
-     private createToken(user: { id: number; name: string; email: string }) {
+     private createToken(user: User) {
           return {
                accessToken: this.jwtService.sign(
                     {
@@ -38,8 +39,6 @@ export class AuthService {
                ),
           };
      }
-
-
      async login(dto: AuthLoginDto) {
           const user = await this.prisma.user.findFirst({
                where: {
