@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { PrismaService } from "src/prisma/prisma.service";
 import { UsersService } from "src/users/users.service";
@@ -39,6 +39,19 @@ export class AuthService {
                ),
           };
      }
+
+     private checkToken(token: string){
+          try {
+               return this.jwtService.verify(token, {
+                    audience: this.audience,
+                    issuer: this.issuer,
+               });
+          
+          } catch (e) {
+               throw new BadRequestException(e)
+          }
+     }
+     
      async login(dto: AuthLoginDto) {
           const user = await this.prisma.user.findFirst({
                where: {
@@ -60,11 +73,7 @@ export class AuthService {
                throw new UnauthorizedException('Invalid password');
           }
 
-          return this.createToken({
-               id: user.id,
-               name: user.name,
-               email: user.email,
-          });
+          return this.createToken(user);
      }
 
      async register(dto: AuthRegisterDto) {
