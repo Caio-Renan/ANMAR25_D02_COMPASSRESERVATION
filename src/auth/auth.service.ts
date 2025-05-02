@@ -5,6 +5,7 @@ import { UsersService } from "src/users/users.service";
 import { AuthRegisterDto } from "./dto/auth-register.dto";
 import { AuthLoginDto } from "./dto/auth-login.dto";
 import * as bcrypt from 'bcrypt';
+import { AuthForgetDto } from "./dto/auth-forget.dto";
 
 
 
@@ -29,13 +30,25 @@ export class AuthService {
                          email: user.email,
                     },
                     {
-                         expiresIn: '2 days',
+                         expiresIn: '1 day',
                          subject: String(user.id),
                          issuer: this.issuer,
                          audience: this.audience,
                     },
                ),
           };
+     }
+
+     private createResetPasswordToken(userId: number){
+          return this.jwtService.sign(
+               { id: userId },
+               {
+                    expiresIn: '1 hour',
+                    subject: String(userId),
+                    issuer: this.issuer,
+                    audience: this.audience,
+               }
+          )
      }
 
 
@@ -73,5 +86,17 @@ export class AuthService {
 
           return this.createToken(user);
      }
+
+    /* async forget(dto: AuthForgetDto) {
+          const mail = await this.prisma.user.findUnique({
+               where: { email: dto.email },
+          });
+
+          if(!mail){
+               throw new NotFoundException('Email not found');
+          }
+
+     }
+*/
 
 }
