@@ -4,8 +4,18 @@ import { UpdateUserDTO } from './dto/update-user.dto'
 import { FilterUserDTO } from './dto/filter-user.dto'
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Prisma } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
 import { getPaginationParams, buildPaginatedResponse } from '../common/utils/pagination.util'
+
+const userSelectWithoutPassword: Prisma.UserSelect = {
+  id: true,
+  name: true,
+  email: true,
+  phone: true,
+  status: true,
+  createdAt: true,
+  updatedAt: true,
+}
 
 @Injectable()
 export class UsersService {
@@ -15,11 +25,13 @@ export class UsersService {
     const existingEmail = await this.prisma.user.findUnique({
       where: { email: dto.email },
     });
-    const existingPhone = await this.prisma.user.findUnique({
-        where: { phone: dto.phone },
-      });
 
     if (existingEmail) throw new ConflictException('email already registered');
+
+    const existingPhone = await this.prisma.user.findUnique({
+        where: { phone: dto.phone },
+    });
+    
     if (existingPhone) throw new ConflictException('phone already registered');
     
     const hash = await bcrypt.hash(dto.password, 10);
@@ -34,16 +46,9 @@ export class UsersService {
   }
 
   async update(id: number, dto: UpdateUserDTO) {
-
-    if (id < 1) { throw new BadRequestException('id must be greater than or equal to 1');}
-
-    if (Number.isNaN(id)) {
-      throw new BadRequestException('id must be a number');
-    }
-
-    const user = await this.prisma.user.findUnique({ where: { id } });
-
-    if (!user) throw new NotFoundException('user not found');
+    await this.isIdValueCorrect(id);
+    
+    const user = await this.checkIfUserExists(id);
 
     if (dto.email && dto.email !== user.email) {
       const emailExists = await this.prisma.user.findUnique({
@@ -99,15 +104,7 @@ export class UsersService {
         where,
         skip,
         take,
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          phone: true,
-          status: true,
-          createdAt: true,
-          updatedAt: true,
-        },
+        select: userSelectWithoutPassword,
       }),
       this.prisma.user.count({ where }),
     ]);
@@ -116,41 +113,18 @@ export class UsersService {
   }
 
   async findById(id: number) {
-    if (Number.isNaN(id)) {
-      throw new BadRequestException('id must be a number');
-    }
+    await this.isIdValueCorrect(id);
 
-    if (id < 1) { throw new BadRequestException('id must be greater than or equal to 1');}
-
-    const user = await this.prisma.user.findUnique({
-      where: { id },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        phone: true,
-        status: true,
-        createdAt: true,
-        updatedAt: true,
-      },
-    });
-
-    if (!user) throw new NotFoundException('user not found');
+    const user = await this.checkIfUserExists(id, userSelectWithoutPassword);
 
     return user;
   }
 
   async softDelete(id: number) {
 
-    if (Number.isNaN(id)) {
-      throw new BadRequestException('id must be a number');
-    }
+    await this.isIdValueCorrect(id);
 
-    if (id < 1) { throw new BadRequestException('id must be greater than or equal to 1');}
-
-    const user = await this.prisma.user.findUnique({ where: { id } });
-
-    if (!user) throw new NotFoundException('user not found');
+    const user = await this.checkIfUserExists(id);
 
     if(user.status === "INACTIVE") { throw new ConflictException("user is already INACTIVE") };
 
@@ -159,15 +133,27 @@ export class UsersService {
       data: {
         status: 'INACTIVE',
         updatedAt: new Date(),
-      }, select: {
-        id: true,
-        name: true,
-        email: true,
-        phone: true,
-        status: true,
-        createdAt: true,
-        updatedAt: true,
-      }
+      }, select: userSelectWithoutPassword
     });
   }
+
+  async isIdValueCorrect(id: number) {
+    if (Number.isNaN(id)) {
+      throw new BadRequestException('id must be a number');
+    }
+
+    if (id < 1) { throw new BadRequestException('id must be greater than or equal to 1');}
+  }
+
+  async checkIfUserExists(id: number, select?: Prisma.UserSelect): Promise<User> {
+    const user = await this.prisma.user.findUnique({
+      where: { id }, select: select
+    });
+  
+    if (!user) {
+      throw new NotFoundException('user not found');
+    }
+
+    return user;
+  } 
 }
