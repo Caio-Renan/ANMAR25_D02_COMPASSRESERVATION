@@ -1,34 +1,36 @@
-import { Body, Controller, Post } from '@nestjs/common';
-import { CreateClientDto } from './dto/create-client.dto';
+import { Body, Controller, Get, Patch, Post, Query, Delete } from '@nestjs/common';
 import { ClientsService } from './clients.service';
-import { Param, Patch } from '@nestjs/common';
+import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
-import { Get } from '@nestjs/common';
+import { FilterClientDto } from './dto/filter-client.dto';
+import { ParamId } from '../common/decorators/param-id.decorator';
 
 @Controller('clients')
 export class ClientsController {
   constructor(private readonly clientsService: ClientsService) {}
 
   @Post()
-  async create(@Body() createClientDto: CreateClientDto) {
-    return this.clientsService.create(createClientDto);
-  }
-
-  @Get()
-  async findAll() {
-    return this.clientsService.findAll();
-  }
-
-  @Get(':id')
-  async findOne(@Param('id') id: string) {
-    return this.clientsService.findOne(Number(id));
+  async create(@Body() dto: CreateClientDto) {
+    return this.clientsService.create(dto);
   }
 
   @Patch(':id')
-  async update(
-    @Param('id') id: string,
-    @Body() updateClientDto: UpdateClientDto,
-  ) {
-    return this.clientsService.update(Number(id), updateClientDto);
+  async updatePartial(@ParamId() id: number, @Body() dto: UpdateClientDto) {
+    return this.clientsService.update(id, dto);
+  }
+
+  @Get()
+  async findAll(@Query() filter: FilterClientDto) {
+    return this.clientsService.findAll(filter);
+  }
+
+  @Get(':id')
+  async findOne(@ParamId() id: number) {
+    return this.clientsService.findById(id);
+  }
+
+  @Delete(':id')
+  async softDelete(@ParamId() id: number) {
+    return this.clientsService.softDelete(id);
   }
 }
