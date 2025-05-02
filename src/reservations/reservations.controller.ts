@@ -41,6 +41,6 @@ export class ReservationController {
 
   @Delete(':id')
   async delete(@Param('id', ParseIntPipe) id: number) {
-    return this.reservationService.delete(id);
+    return this.reservationService.softDelete(id);
   }
 }
