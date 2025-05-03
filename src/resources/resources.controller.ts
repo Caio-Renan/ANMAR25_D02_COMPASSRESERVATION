@@ -9,14 +9,17 @@ export class ResourcesController {
   async create(@Body() data: { name: string; quantity: number; description: string }) {
     return this.resourcesService.createResource(data);
   }
-
+ 
   @Get()
   async findAll(
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
+    @Query('name') name?: string,
+    @Query('status') status?: string,
   ) {
-    return this.resourcesService.findAll(page, limit);
-  }   
+    return this.resourcesService.findAll(page, limit, name, status);
+  }
+  
 
   @Get(':id')
   async findOne(@Param('id') id: number) {
