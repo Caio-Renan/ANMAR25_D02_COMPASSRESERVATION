@@ -9,6 +9,7 @@ import { AuthForgetDto } from "./dto/auth-forget.dto";
 import { User } from "@prisma/client";
 import { EmailService } from "src/email/email.service";
 import { AuthResetDto } from "./dto/auth-reset.dto";
+import { AuthVerifyEmailDto } from "./dto/auth-verify-email.dto";
 
 
 
@@ -135,6 +136,26 @@ export class AuthService {
 
           return { message: 'Password successfully updated' };
 
+     }
+
+     async verifyEmail(dto: AuthVerifyEmailDto){
+          const payload = this.jwtService.verify(dto.token, {
+               issuer: 'email-verification',
+               audience: 'clients',
+          });
+
+          const clientId = payload.id;
+
+          if(!clientId) {
+               throw new BadRequestException('Invalid Token');
+          }
+
+          await this.prisma.client.update({
+               where: { id: clientId },
+               data: { isEmailVerified: true },
+          });
+
+          return { message: 'Email sucessfully verified'};
      }
 
 }
