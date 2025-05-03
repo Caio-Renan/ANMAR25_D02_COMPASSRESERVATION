@@ -44,7 +44,7 @@ export class ResourcesService {
   findOne(id: number) {
     const resource = this.resources.find(resource => resource.id === id);
     if (!resource) {
-      throw new Error('Resource not found');
+      throw new ConflictException('Resource not found');
     }
     return resource;
   }
