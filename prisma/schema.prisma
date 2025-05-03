@@ -23,6 +23,7 @@ model Client {
   name         String
   cpf          String        @unique
   email        String        @unique
+  isEmailVerified Boolean    @default(false)
   phone        String        @unique
   birthDate    DateTime
   status       Status        @default(ACTIVE)
