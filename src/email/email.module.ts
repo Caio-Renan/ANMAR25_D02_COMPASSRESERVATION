@@ -21,7 +21,7 @@ import { EmailService } from "./email.service";
              from: '"nest-modules" <modules@nestjs.com>',
            },
            template: {
-             dir: __dirname + '/templates',
+             dir: __dirname + '/common' + '/templates',
              adapter: new PugAdapter(),
              options: {
                strict: true,
