@@ -55,14 +55,18 @@ export class ResourcesService {
       throw new ConflictException('Resource not found');
     }
 
-    this.resources[resourceIndex] = { ...this.resources[resourceIndex], ...data };
+    this.resources[resourceIndex] = { 
+      ...this.resources[resourceIndex],
+      ...data,
+      updatedAt: new Date() 
+    };
+    
     return this.resources[resourceIndex];
   }
 
   delete(id: number) {
     const resourceIndex = this.resources.findIndex(resource => resource.id === id);
     if (resourceIndex === -1) {
-      //throw new Error('Resource not found');
       throw new ConflictException('Resource not found');
     }
 
