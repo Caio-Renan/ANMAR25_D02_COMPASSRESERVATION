@@ -52,7 +52,7 @@ export class ResourcesService {
   update(id: number, data: Partial<Resource>) {
     const resourceIndex = this.resources.findIndex(resource => resource.id === id);
     if (resourceIndex === -1) {
-      throw new Error('Resource not found');
+      throw new ConflictException('Resource not found');
     }
 
     this.resources[resourceIndex] = { ...this.resources[resourceIndex], ...data };
@@ -62,7 +62,8 @@ export class ResourcesService {
   delete(id: number) {
     const resourceIndex = this.resources.findIndex(resource => resource.id === id);
     if (resourceIndex === -1) {
-      throw new Error('Resource not found');
+      //throw new Error('Resource not found');
+      throw new ConflictException('Resource not found');
     }
 
     const deletedResource = this.resources.splice(resourceIndex, 1);
