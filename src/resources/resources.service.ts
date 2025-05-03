@@ -91,7 +91,12 @@ export class ResourcesService {
       throw new NotFoundException(`Resource with ID ${id} not found`);
     }
 
-    const deletedResource = this.resources.splice(resourceIndex, 1);
-    return deletedResource[0];
+    this.resources[resourceIndex] = {
+      ...this.resources[resourceIndex],
+      status: 'inactive',
+      updatedAt: new Date(),
+    };
+    
+    return this.resources[resourceIndex];
   }
 }
