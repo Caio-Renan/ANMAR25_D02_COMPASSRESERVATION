@@ -13,12 +13,15 @@ import {
 import { ReservationValidationService } from './reservationsValidate.service';
 import { Prisma, Reservation } from '@prisma/client';
 import { UpdateReservationDto } from './dto/update-reservation-dto';
+import ical from 'ical-generator';
+import { EmailService } from 'src/email/email.service';
 
 @Injectable()
 export class ReservationService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly validationService: ReservationValidationService,
+    private readonly emailService: EmailService,
   ) {}
 
   async create({
@@ -92,6 +95,21 @@ export class ReservationService {
           'Only reservations with "open" status can be approved',
         );
       }
+
+      const client = await this.prisma.client.findUnique({
+        where: { id: reservation.clientId },
+      })
+
+      if(client) {
+        await this.emailService.sendReservationApprovalEmail(
+          client.email,
+          client.name,
+          reservation.startDate,
+          reservation.endDate,
+          `Space ${reservation.spaceId}`
+        )
+      }
+
     }
 
     if (data.status === 'CLOSED') {
