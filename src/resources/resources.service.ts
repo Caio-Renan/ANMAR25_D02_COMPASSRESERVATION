@@ -88,7 +88,7 @@ export class ResourcesService {
   delete(id: number) {
     const resourceIndex = this.resources.findIndex(resource => resource.id === id);
     if (resourceIndex === -1) {
-      throw new ConflictException('Resource not found');
+      throw new NotFoundException(`Resource with ID ${id} not found`);
     }
 
     const deletedResource = this.resources.splice(resourceIndex, 1);
