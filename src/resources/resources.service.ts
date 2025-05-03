@@ -35,18 +35,28 @@ export class ResourcesService {
     this.resources.push(newResource);
 
     return newResource;
-  }
-
-
-  findAll(page: number, limit: number) {
+  } 
+ 
+  findAll(page: number, limit: number, name?: string, status?: string) {
+    let filteredResources = this.resources;
+  
+    if (name) {
+      filteredResources = filteredResources.filter(resource =>
+        resource.name.toLowerCase().includes(name.toLowerCase()),
+      );
+    }
+  
+    if (status) {
+      filteredResources = filteredResources.filter(resource => resource.status === status);
+    }
+  
     const startIndex = (page - 1) * limit;
     const endIndex = startIndex + limit;
-  
-    const paginatedResources = this.resources.slice(startIndex, endIndex);
+    const paginatedResources = filteredResources.slice(startIndex, endIndex);
   
     return {
       data: paginatedResources,
-      total: this.resources.length,
+      total: filteredResources.length,
       page,
       limit,
     };
