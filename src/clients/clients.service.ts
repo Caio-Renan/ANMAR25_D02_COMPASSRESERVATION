@@ -10,6 +10,8 @@ import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
 import { FilterClientDto } from './dto/filter-client.dto';
 import { getPaginationParams, buildPaginatedResponse } from '../common/utils/pagination.util';
+import { JwtService } from '@nestjs/jwt';
+import { EmailService } from 'src/email/email.service';
 
 const clientSelect: Prisma.ClientSelect = {
   id: true,
@@ -25,7 +27,11 @@ const clientSelect: Prisma.ClientSelect = {
 
 @Injectable()
 export class ClientsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly jwtService: JwtService,
+    private readonly emailService: EmailService,
+  ) { }
 
   async create(dto: CreateClientDto): Promise<Client> {
     const existingCpf = await this.prisma.client.findUnique({ where: { cpf: dto.cpf } });
@@ -37,13 +43,35 @@ export class ClientsService {
     const existingPhone = await this.prisma.client.findUnique({ where: { phone: dto.phone } });
     if (existingPhone) throw new ConflictException('Phone already registered');
 
-    return this.prisma.client.create({
+    const client = await this.prisma.client.create({
       data: {
         ...dto,
         status: 'ACTIVE',
       },
       select: clientSelect,
     });
+
+
+    const token = this.jwtService.sign(
+      { id: client.id },
+      {
+        expiresIn: '1h',
+        subject: String(client.id),
+        issuer: 'email-verification',
+        audience: 'clients',
+      }
+    );
+
+
+    const validationUrl = `${process.env.APP_URL}/auth/verify-email??token=${token}`
+
+    await this.emailService.sendEmailVerification(client.email, client.name, validationUrl)
+
+
+    return client;
+
+
+
   }
 
   async update(id: number, dto: UpdateClientDto): Promise<Client> {
