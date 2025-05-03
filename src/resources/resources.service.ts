@@ -37,9 +37,20 @@ export class ResourcesService {
     return newResource;
   }
 
-  findAll() {
-    return this.resources;
-  }
+
+  findAll(page: number, limit: number) {
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+  
+    const paginatedResources = this.resources.slice(startIndex, endIndex);
+  
+    return {
+      data: paginatedResources,
+      total: this.resources.length,
+      page,
+      limit,
+    };
+  }  
 
   findOne(id: number) {
     const resource = this.resources.find(resource => resource.id === id);
