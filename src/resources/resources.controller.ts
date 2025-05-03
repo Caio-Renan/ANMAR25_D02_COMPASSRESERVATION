@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Put } from '@nestjs/common';
 import { ResourcesService } from './resources.service';
 
 @Controller('resources')
@@ -11,9 +11,12 @@ export class ResourcesController {
   }
 
   @Get()
-  async findAll() {
-    return this.resourcesService.findAll();
-  }
+  async findAll(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ) {
+    return this.resourcesService.findAll(page, limit);
+  }   
 
   @Get(':id')
   async findOne(@Param('id') id: number) {
