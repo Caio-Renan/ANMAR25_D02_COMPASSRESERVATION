@@ -6,6 +6,9 @@ import { UsersModule } from './users/users.module';
 import { SpacesModule } from './spaces/spaces.module';
 import { ClientsModule } from './clients/clients.module';
 import { AuthModule } from './auth/auth.module';
+import { ConfigModule } from '@nestjs/config';
+import { validateEnv } from './common/config/env/validate-env';
+
 
 @Module({
   imports: [
@@ -13,7 +16,11 @@ import { AuthModule } from './auth/auth.module';
     ReservationModule, 
     UsersModule, 
     SpacesModule, 
-    ClientsModule
+    ClientsModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+      validate: validateEnv,
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],
