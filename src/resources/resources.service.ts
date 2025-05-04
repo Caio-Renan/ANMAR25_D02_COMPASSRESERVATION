@@ -1,4 +1,5 @@
 import { ConflictException, Injectable, NotFoundException, BadRequestException, } from '@nestjs/common';
+import { CreateResourceDto } from './dto/create-resource-dto';
 
 export interface Resource {
   id: number;
