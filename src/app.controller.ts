@@ -5,8 +5,4 @@ import { AppService } from './app.service';
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Get('/') // Este decorator define um manipulador para a rota GET '/'
-  getHello(): string {
-    return this.appService.getHello();
-  }
 }
