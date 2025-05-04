@@ -5,23 +5,26 @@ import { AuthService } from "./auth.service";
 import { AuthController } from "./auth.controller";
 import { UsersModule } from "src/users/users.module";
 import { EmailModule } from "src/email/email.module";
-
+import { ConfigModule, ConfigService } from "@nestjs/config";
+import { JwtStrategy } from './jwt.strategy';
 
 @Module({
-     imports: [
-          JwtModule.register({
-               global: true,
-               secret: process.env.JWT_SECRET,
-               signOptions: { expiresIn: process.env.JWT_EXPIRATION || '1d' }
-          }),
-          PrismaModule,
-          forwardRef(() => UsersModule),
-          EmailModule,
-     ],
-     providers: [AuthService],
-     exports: [AuthService],
-     controllers: [AuthController],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }), 
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (config: ConfigService) => ({
+        secret: config.get<string>('JWT_SECRET'),
+        signOptions: { expiresIn: config.get<string>('JWT_EXPIRATION') || '1d' },
+      }),
+    }),
+    PrismaModule,
+    forwardRef(() => UsersModule),
+    EmailModule,
+  ],
+  providers: [AuthService, JwtStrategy,],
+  exports: [AuthService, JwtModule],
+  controllers: [AuthController],
 })
-export class AuthModule {
-
-}
+export class AuthModule {}
