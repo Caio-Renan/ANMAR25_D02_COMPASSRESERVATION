@@ -7,6 +7,8 @@ export const requiredEnvVars = [
     'DEFAULT_USER_PASSWORD',
     'DEFAULT_USER_PHONE',
     'APP_URL',
-    'PORT'
+    'PORT',
+    'JWT_SECRET',
+    'JWT_EXPIRATION'
 ];
     
