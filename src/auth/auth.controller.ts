@@ -21,7 +21,7 @@ export class AuthController {
       default: {
         summary: 'Example Login Body',
         value: {
-          email: 'john.doe@company.com',
+          email: 'Thiago.sampaio@compass.com',
           password: 'StrongPassword!2023',
         },
       },
@@ -41,15 +41,15 @@ export class AuthController {
       default: {
         summary: 'Example Register Body',
         value: {
-          name: 'John Doe',
-          email: 'john.doe@company.com',
+          name: 'Thiago Sampaio',
+          email: 'Thiago.sampaio@compass.com',
           password: 'StrongPassword!2023',
-          phone: '+55 (11) 98765-4321',
+          phone: '+55 (71) 98765-4321',
         },
       },
     },
   })
-  @ApiResponse({ status: 201, description: 'User registered successfully', schema: { example: { id: 1, name: 'John Doe', email: 'john.doe@company.com' } } })
+  @ApiResponse({ status: 201, description: 'User registered successfully', schema: { example: { id: 1, name: 'Thiago Sampaio', email: 'Thiago.sampaio@compass.com' } } })
   @ApiResponse({ status: 400, description: 'Validation error' })
   @Post('register')
   async register(@Body() dto: AuthRegisterDto) {
@@ -61,7 +61,7 @@ export class AuthController {
   @ApiResponse({
     status: 200,
     description: 'User profile retrieved successfully',
-    schema: { example: { id: 1, name: 'John Doe', email: 'john.doe@company.com', phone: '+55 (11) 98765-4321' } },
+    schema: { example: { id: 1, name: 'Thiago Sampaio', email: 'Thiago.sampaio@compass.com', phone: '+55 (11) 98765-4321' } },
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @Get('me')
@@ -77,7 +77,7 @@ export class AuthController {
       default: {
         summary: 'Example Forget Password Body',
         value: {
-          email: 'john.doe@company.com',
+          email: 'Thiago.sampaio@compass.com',
         },
       },
     },
