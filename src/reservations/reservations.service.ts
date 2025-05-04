@@ -31,25 +31,21 @@ export class ReservationService {
     startDate,
     resources,
   }: CreateReservationDto) {
-    if (!resources || !Array.isArray(resources.create)) {
+    if (!resources || !Array.isArray(resources)) {
       throw new NotAcceptableException('Invalid resources format');
     }
 
     const isSpaceActive = await this.validationService.isSpaceActive(spaceId);
-
     if (!isSpaceActive) {
       throw new NotFoundException('Space not found or is inactive');
     }
 
-    const resourceArray = resources.create;
+    console.log('No service de reservation: ', resources);
 
-    await this.validationService.isResourceActiveAndEnough(resourceArray);
-
+    await this.validationService.isResourceActiveAndEnough(resources);
     await this.validationService.isDateAvailable(spaceId, startDate, endDate);
-
     await this.validationService.verifyClient(clientId);
-
-    await this.validationService.updateQuantity(resourceArray);
+    await this.validationService.updateQuantity(resources);
 
     return this.prisma.reservation.create({
       data: {
@@ -59,7 +55,7 @@ export class ReservationService {
         endDate,
         status: 'OPEN',
         resources: {
-          create: resourceArray,
+          create: resources,
         },
       },
     });
@@ -98,18 +94,17 @@ export class ReservationService {
 
       const client = await this.prisma.client.findUnique({
         where: { id: reservation.clientId },
-      })
+      });
 
-      if(client) {
+      if (client) {
         await this.emailService.sendReservationApprovalEmail(
           client.email,
           client.name,
           reservation.startDate,
           reservation.endDate,
-          `Space ${reservation.spaceId}`
-        )
+          `Space ${reservation.spaceId}`,
+        );
       }
-
     }
 
     if (data.status === 'CLOSED') {

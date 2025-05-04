@@ -10,13 +10,13 @@ import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { validateEnv } from './common/config/env/validate-env';
 
-
 @Module({
   imports: [
     AuthModule,
-    ReservationModule, 
-    UsersModule, 
-    SpacesModule, 
+    ReservationModule,
+    UsersModule,
+    SpacesModule,
+    ResourcesModule,
     ClientsModule,
     ConfigModule.forRoot({
       isGlobal: true,

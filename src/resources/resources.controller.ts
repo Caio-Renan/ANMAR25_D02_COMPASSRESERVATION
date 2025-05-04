@@ -1,25 +1,32 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Put } from '@nestjs/common';
-import { ResourcesService } from './resources.service';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  Put,
+} from '@nestjs/common';
+import { ResourcesSevice } from './resources.service';
+import { CreateResourceDto } from './dto/create-resource-dto';
+import { UpdateResourceDto } from './dto/update-resource.dto';
+import { ParamId } from 'src/common/decorators/param-id.decorator';
 
 @Controller('resources')
 export class ResourcesController {
-  constructor(private readonly resourcesService: ResourcesService) {}
+  constructor(private readonly resourcesService: ResourcesSevice) {}
 
   @Post()
-  async create(@Body() data: { name: string; quantity: number; description: string }) {
-    return this.resourcesService.createResource(data);
+  async create(@Body() data: CreateResourceDto) {
+    return this.resourcesService.create(data);
   }
- 
+
   @Get()
-  async findAll(
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10,
-    @Query('name') name?: string,
-    @Query('status') status?: string,
-  ) {
-    return this.resourcesService.findAll(page, limit, name, status);
+  async findAll() {
+    return this.resourcesService.findAll();
   }
-  
 
   @Get(':id')
   async findOne(@Param('id') id: number) {
@@ -27,12 +34,12 @@ export class ResourcesController {
   }
 
   @Patch(':id')
-  async update(@Body() data: Partial<{ name: string; quantity: number; description: string }>, @Param('id') id: number) {
-    return this.resourcesService.update(id, data);
+  async updatePartial(@Body() data: UpdateResourceDto, @ParamId() id: number) {
+    return this.resourcesService.updatePartial(id, data);
   }
 
   @Delete(':id')
   async delete(@Param('id') id: number) {
-    return this.resourcesService.delete(id);
+    return this.resourcesService.softDelete(id);
   }
 }
