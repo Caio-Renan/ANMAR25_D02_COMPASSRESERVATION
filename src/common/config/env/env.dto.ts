@@ -1,4 +1,4 @@
-import { IsEnum, Matches, IsBooleanString, IsEmail, IsNotEmpty, ValidateIf, IsUrl } from 'class-validator';
+import { IsEnum, Matches, IsBooleanString, IsEmail, IsNotEmpty, ValidateIf, IsUrl, IsNumberString } from 'class-validator';
 import { Environment } from './env.enum';
 
 export class EnvironmentDTO {
@@ -23,4 +23,7 @@ export class EnvironmentDTO {
   @ValidateIf(o => o.EMAIL_ENABLED === "true")
   @IsNotEmpty({ message: 'MAIL_PASS is required' })
   MAIL_PASS?: string;
+
+  @IsNumberString()
+  PORT: string;
 }
