@@ -11,9 +11,10 @@ import {
 import { ReservationService } from './reservations.service';
 import { CreateReservationDto } from './dto/create-reservation-dto';
 import { UpdateReservationDto } from './dto/update-reservation-dto';
-import { ApiTags, ApiOperation, ApiBody, ApiResponse, ApiParam } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBody, ApiResponse, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
 
 @ApiTags('Reservations')
+@ApiBearerAuth()
 @Controller('reservations')
 export class ReservationController {
   constructor(private readonly reservationService: ReservationService) {}

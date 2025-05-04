@@ -11,9 +11,10 @@ import { ResourcesSevice } from './resources.service';
 import { CreateResourceDto } from './dto/create-resource-dto';
 import { UpdateResourceDto } from './dto/update-resource.dto';
 import { ParamId } from 'src/common/decorators/param-id.decorator';
-import { ApiTags, ApiOperation, ApiBody, ApiResponse, ApiParam } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBody, ApiResponse, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
 
 @ApiTags('Resources')
+@ApiBearerAuth()
 @Controller('resources')
 export class ResourcesController {
   constructor(private readonly resourcesService: ResourcesSevice) {}
