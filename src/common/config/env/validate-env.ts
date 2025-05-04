@@ -16,6 +16,7 @@ export type ValidatedEnv = {
   DEFAULT_USER_EMAIL: string;
   DEFAULT_USER_PASSWORD: string;
   DEFAULT_USER_PHONE: string;
+  PORT: string;
 };
 
 export function validateEnv(config: Record<string, unknown>): ValidatedEnv {
@@ -70,6 +71,7 @@ export function validateEnv(config: Record<string, unknown>): ValidatedEnv {
     EMAIL_ENABLED: envConfig.EMAIL_ENABLED,
     MAIL_USER: envConfig.MAIL_USER,
     MAIL_PASS: envConfig.MAIL_PASS,
+    PORT: envConfig.PORT,
     DEFAULT_USER_NAME: userDTO.name,
     DEFAULT_USER_EMAIL: userDTO.email,
     DEFAULT_USER_PASSWORD: userDTO.password,
