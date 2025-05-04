@@ -1,17 +1,17 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
-import { config } from 'dotenv';
-import { resolve } from 'path';
-
-const envFilePath: string = resolve(__dirname, '../.env');
-config({ path: envFilePath });
+import { AuthGuard } from './common/guards/auth.guard';
+import { JwtService } from '@nestjs/jwt';
+import { LoggingInterceptor } from './interceptors/logging.inteceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableShutdownHooks();
 
   app.enableCors();
+
+  app.useGlobalGuards(new AuthGuard(new JwtService()));
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -20,6 +20,8 @@ async function bootstrap() {
       transform: true,
     }),
   );
+
+  app.useGlobalInterceptors(new LoggingInterceptor());
 
   await app.listen(process.env.PORT ?? 3000);
 }
