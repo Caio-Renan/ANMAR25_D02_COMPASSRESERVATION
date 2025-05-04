@@ -8,7 +8,7 @@ import { ResourcesModule } from './resources/resources.module';
 import { ClientsModule } from './clients/clients.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
-// import { validateEnv } from './common/config/env/validate-env'; // se for utilizar o (validate: validateEnv)
+import { validateEnv } from './common/config/env/validate-env';
 
 
 @Module({
@@ -20,6 +20,7 @@ import { ConfigModule } from '@nestjs/config';
     ClientsModule,
     ConfigModule.forRoot({
       isGlobal: true,
+      validate: validateEnv,
       envFilePath: '.env',
     }),
   ],
