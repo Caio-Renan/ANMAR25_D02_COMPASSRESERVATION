@@ -17,6 +17,7 @@ import { validateEnv } from './common/config/env/validate-env';
     ReservationModule, 
     UsersModule, 
     SpacesModule, 
+    ResourcesModule, 
     ClientsModule,
     ConfigModule.forRoot({
       isGlobal: true,
