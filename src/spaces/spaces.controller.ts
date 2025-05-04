@@ -2,9 +2,10 @@ import { Body, Controller, DefaultValuePipe, Delete, Get, HttpException, HttpSta
 import { createSpaceDto } from "./dto/create-space-dto";
 import { updateSpaceDto } from "./dto/update-space-dto";
 import { SpacesService } from "./spaces.service";
-import { ApiTags, ApiOperation, ApiBody, ApiResponse, ApiParam, ApiQuery } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBody, ApiResponse, ApiParam, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
 
 @ApiTags('Spaces')
+@ApiBearerAuth()
 @Controller('spaces')
 export class SpacesController {
   constructor(private readonly spacesService: SpacesService) {}

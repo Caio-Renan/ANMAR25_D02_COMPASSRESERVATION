@@ -4,9 +4,10 @@ import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
 import { FilterClientDto } from './dto/filter-client.dto';
 import { ParamId } from '../common/decorators/param-id.decorator';
-import { ApiTags, ApiOperation, ApiBody, ApiResponse, ApiQuery, ApiParam } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBody, ApiResponse, ApiQuery, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
 
 @ApiTags('Clients')
+@ApiBearerAuth()
 @Controller('clients')
 export class ClientsController {
   constructor(private readonly clientsService: ClientsService) {}
