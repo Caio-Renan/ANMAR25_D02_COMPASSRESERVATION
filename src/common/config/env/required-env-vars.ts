@@ -6,6 +6,7 @@ export const requiredEnvVars = [
     'DEFAULT_USER_EMAIL',
     'DEFAULT_USER_PASSWORD',
     'DEFAULT_USER_PHONE',
-    'APP_URL'
+    'APP_URL',
+    'PORT'
 ];
     
