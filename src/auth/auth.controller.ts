@@ -44,7 +44,7 @@ export class AuthController {
           name: 'John Doe',
           email: 'john.doe@company.com',
           password: 'StrongPassword!2023',
-          phone: '+1 (123) 456-7890',
+          phone: '+55 (11) 98765-4321',
         },
       },
     },
@@ -61,7 +61,7 @@ export class AuthController {
   @ApiResponse({
     status: 200,
     description: 'User profile retrieved successfully',
-    schema: { example: { id: 1, name: 'John Doe', email: 'john.doe@company.com', phone: '+1 (123) 456-7890' } },
+    schema: { example: { id: 1, name: 'John Doe', email: 'john.doe@company.com', phone: '+55 (11) 98765-4321' } },
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @Get('me')
