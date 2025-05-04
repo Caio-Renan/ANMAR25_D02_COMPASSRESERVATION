@@ -105,6 +105,17 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Password reset successfully' })
   @ApiResponse({ status: 400, description: 'Invalid token or validation error' })
   @ApiResponse({ status: 404, description: 'User not found for the provided token' })
+  @ApiBody({
+     type: AuthResetDto,
+     examples: {
+          default: {
+               summary: 'Token',
+               value: {
+                    token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...', 
+               }
+          }
+     }
+  })
   @Post('reset')
   async reset(@Body() dto: AuthResetDto) {
     return this.authService.reset(dto);
