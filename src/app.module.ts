@@ -13,10 +13,10 @@ import { ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
-    ThrottlerModule.forRoot({
+    ThrottlerModule.forRoot([{
       ttl: 60,
       limit: 10,
-    })
+    }]),
     AuthModule,
     ReservationModule,
     UsersModule,
