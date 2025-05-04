@@ -2,7 +2,7 @@ import { MailerModule } from "@nestjs-modules/mailer";
 import { Module } from "@nestjs/common";
 import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
 import { EmailService } from "./email.service";
-
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -26,7 +26,7 @@ import { EmailService } from "./email.service";
             from: '"nest-modules" <modules@nestjs.com>',
           },
           template: {
-            dir: __dirname + '/common' + '/templates',
+            dir: join(__dirname, '..','common', 'templates'),
             adapter: new PugAdapter(),
             options: {
               strict: true,

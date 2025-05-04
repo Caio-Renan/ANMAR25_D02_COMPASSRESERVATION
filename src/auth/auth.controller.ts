@@ -6,6 +6,8 @@ import { AuthRegisterDto } from "./dto/auth-register.dto";
 import { CurrentUser } from "src/common/decorators/current-user.decorator";
 import { AuthResetDto } from "./dto/auth-reset.dto";
 import { AuthVerifyEmailDto } from "./dto/auth-verify-email.dto";
+import { UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 
 
 @Controller()
@@ -25,6 +27,7 @@ export class AuthController {
      }
 
      @Get('me')
+     @UseGuards(AuthGuard('jwt'))
      async getProfile(@CurrentUser() user: any) {
           return user;
      }

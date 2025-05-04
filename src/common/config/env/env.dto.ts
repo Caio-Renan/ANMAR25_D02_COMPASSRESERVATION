@@ -1,4 +1,4 @@
-import { IsEnum, Matches, IsBooleanString, IsEmail, IsNotEmpty, ValidateIf, IsUrl, IsNumberString } from 'class-validator';
+import { IsEnum, Matches, IsBooleanString, IsEmail, IsNotEmpty, ValidateIf, IsUrl, IsNumberString, IsString } from 'class-validator';
 import { Environment } from './env.enum';
 
 export class EnvironmentDTO {
@@ -26,4 +26,10 @@ export class EnvironmentDTO {
 
   @IsNumberString()
   PORT: string;
+
+  @IsString({ message: 'JWT_SECRET must be a string' })
+  JWT_SECRET: string;
+
+  @Matches(/^\d+$|^\d+[smhd]$/, { message:'JWT_EXPIRATION must be a number (e.g., 3600) or a string with time unit (e.g., 15m, 10h, 1d, 30s)' })
+  JWT_EXPIRATION: string;
 }

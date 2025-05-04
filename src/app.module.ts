@@ -22,6 +22,7 @@ import { validateEnv } from './common/config/env/validate-env';
     ConfigModule.forRoot({
       isGlobal: true,
       validate: validateEnv,
+      envFilePath: '.env',
     }),
   ],
   controllers: [AppController],

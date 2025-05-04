@@ -11,7 +11,7 @@ async function bootstrap() {
 
   app.enableCors();
 
-  app.useGlobalGuards(new AuthGuard(new JwtService()));
+  // app.useGlobalGuards(new AuthGuard(new JwtService())); // Deixei comentado por que isso ativa a proteção global de todas as rotas
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -21,7 +21,7 @@ async function bootstrap() {
     }),
   );
 
-  app.useGlobalInterceptors(new LoggingInterceptor());
+app.useGlobalInterceptors(new LoggingInterceptor());
 
   await app.listen(process.env.PORT ?? 3000);
 }
