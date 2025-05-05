@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException, ConflictException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, ConflictException, ForbiddenException } from '@nestjs/common';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { UpdateUserDTO } from './dto/update-user.dto'
 import { FilterUserDTO } from './dto/filter-user.dto'
@@ -13,6 +13,7 @@ const userSelectWithoutPassword: Prisma.UserSelect = {
   email: true,
   phone: true,
   status: true,
+  role: true,
   createdAt: true,
   updatedAt: true,
 }
@@ -45,30 +46,33 @@ export class UsersService {
     });
   }
 
-  async update(id: number, dto: UpdateUserDTO) {
+  async update(id: number, dto: UpdateUserDTO, user: any) {
+    if (user.role !== 'ADMIN' && user.id !== id) {
+      throw new ForbiddenException('You do not have permission to update this user');
+    }
+  
     await this.isIdValueCorrect(id);
-    
-    const user = await this.checkIfUserExists(id);
-
-    if (dto.email && dto.email !== user.email) {
+    const existingUser = await this.checkIfUserExists(id);
+  
+    if (dto.email && dto.email !== existingUser.email) {
       const emailExists = await this.prisma.user.findUnique({
         where: { email: dto.email },
       });
-      if (emailExists) throw new ConflictException('email already registered');
+      if (emailExists) throw new ConflictException('Email already in use');
     }
-
-    if (dto.phone && dto.phone !== user.phone) {
+  
+    if (dto.phone && dto.phone !== existingUser.phone) {
       const phoneExists = await this.prisma.user.findUnique({
         where: { phone: dto.phone },
       });
-      if (phoneExists) throw new ConflictException('phone already registered');
+      if (phoneExists) throw new ConflictException('Phone number already in use');
     }
-
-    let password = user.password;
+  
+    let password = existingUser.password;
     if (dto.password) {
       password = await bcrypt.hash(dto.password, 10);
     }
-
+  
     return this.prisma.user.update({
       where: { id },
       data: {
@@ -116,7 +120,6 @@ export class UsersService {
     await this.isIdValueCorrect(id);
 
     const user = await this.checkIfUserExists(id, userSelectWithoutPassword);
-
     return user;
   }
 

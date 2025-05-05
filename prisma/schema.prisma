@@ -14,8 +14,14 @@ model User {
   password  String
   phone     String   @unique
   status    Status   @default(ACTIVE)
+  role      Role     @default(USER)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+enum Role {
+  USER
+  ADMIN
 }
 
 model Client {

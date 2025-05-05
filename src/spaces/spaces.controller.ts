@@ -1,12 +1,15 @@
-import { Body, Controller, DefaultValuePipe, Delete, Get, HttpException, HttpStatus, Param, ParseIntPipe, Patch, Post, Query, ValidationPipe } from "@nestjs/common";
+import { Body, Controller, DefaultValuePipe, Delete, Get, HttpException, HttpStatus, Param, ParseIntPipe, Patch, Post, Query, ValidationPipe, UseGuards } from "@nestjs/common";
 import { createSpaceDto } from "./dto/create-space-dto";
 import { updateSpaceDto } from "./dto/update-space-dto";
 import { SpacesService } from "./spaces.service";
 import { ApiTags, ApiOperation, ApiBody, ApiResponse, ApiParam, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('Spaces')
 @ApiBearerAuth()
+
 @Controller('spaces')
+@UseGuards(AuthGuard('jwt'))
 export class SpacesController {
   constructor(private readonly spacesService: SpacesService) {}
 

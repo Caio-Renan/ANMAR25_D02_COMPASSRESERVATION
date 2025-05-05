@@ -7,15 +7,18 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { ReservationService } from './reservations.service';
 import { CreateReservationDto } from './dto/create-reservation-dto';
 import { UpdateReservationDto } from './dto/update-reservation-dto';
 import { ApiTags, ApiOperation, ApiBody, ApiResponse, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('Reservations')
 @ApiBearerAuth()
 @Controller('reservations')
+@UseGuards(AuthGuard('jwt'))
 export class ReservationController {
   constructor(private readonly reservationService: ReservationService) {}
 
