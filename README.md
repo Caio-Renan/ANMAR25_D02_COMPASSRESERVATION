@@ -94,6 +94,17 @@ npx prisma migrate dev
 npm run dev
 ```
 
+#### Npm Run Script's:
+
+I recommend using `Npm run seed` to generate the initial seed with a regular User and an Admin User containing the Login you specified in the .env file.
+
+```
+Npm run seed
+```
+
+![image](https://github.com/user-attachments/assets/a9a341c6-728d-475c-a5d9-abc8df606d06)
+
+
 ## 📚 Swagger Documentation
 
 Access the `/api` endpoint after starting the server to view the API documentation generated with Swagger.
@@ -116,8 +127,91 @@ src/
 └── main.ts           # Application entry point
 ```
 
+#Start the project in development mode:
+
+```bash
+npm run dev
+```
+
+## Server initializate in `Localhost:3000`
+
+### First step endpoint's:
+
+* localhost:3000/api/v1/register
+ In case you don't use the seed in the .env
+
+
+## 🔑 Authentication and Token Usage (In case you use the seed)
+
+* localhost:3000/api/v1/login
+
+After a new user registers or after running `Npm run seed`, users can obtain an access token to interact with the API's protected routes.
+
+**Login Flow:**
+
+1.  Use the authentication route (usually `/api/v1/login` with the credentials configured in the `.env` file (for the default seed users) or the credentials of a newly registered user.
+
+    * **Regular User (Seed):** Use the `DEFAULT_USER_EMAIL` and `DEFAULT_USER_PASSWORD` defined in the `.env`.
+    * **Administrator (Seed):** Use the `DEFAULT_ADMIN_EMAIL` and `DEFAULT_ADMIN_PASSWORD` defined in the `.env`.
+    * **Registered User:** Use the email and password provided during the registration process.
+      
+![image](https://github.com/user-attachments/assets/fcc85300-52bd-460a-a9b7-310cc8d3676a)
+> (Image example for Admin user)
+
+
+2.  The response from this route will be a JSON object containing the Admin or Regular `access_token`. Example:
+
+   ![image](https://github.com/user-attachments/assets/e4e64020-0d33-4efe-8da6-0bc778e465fe)
+   
+> (Image example for Admin user)
+
+**Using the Token:**
+
+To access the API's protected routes, you need to include the `access_token` in the header of your HTTP request. The most common way is by using the **Bearer Token** authentication scheme in the `Authorization` field.
+
+**Example of how to configure in Postman:**
+
+1.  In the "Authorization" tab of your request.
+2.  Select the "Bearer Token" type.
+3.  In the "Token" field, paste the `access_token` received in the login response.
+   
+![image](https://github.com/user-attachments/assets/d1f8c968-ffe2-4d7d-b829-039fb969f2ae)
+
+> (Authorization example)
+
+![image](https://github.com/user-attachments/assets/cafa4e1e-4c6d-421f-8e19-d1737e11f6e5)
+> (Header example)
+
+
+
+After configuring the `Authorization` with the Bearer Token, your requests to protected routes will be authenticated.
+
+**User Roles:**
+
+* **Users with the `USER` role:** Will have access to the functionalities designated for regular users. The token returned for the default user credentials (`DEFAULT_USER_EMAIL`) or a new registered user will contain the `USER` role.
+
+* **Users with the `ADMIN` role:** Will have access to all API functionalities, including administrative routes. The token returned for the default administrator credentials (`DEFAULT_ADMIN_EMAIL`) will contain the `ADMIN` role.
+
+Make sure to store the token securely in your development environment or client application.
+
 ## 🤝 Contribution
 
 - Follow Gitflow: `feature/feature-name`, `fix/bug-fix`, etc.
 - Use semantic commits (`feat:`, `fix:`, `docs:`)
 - Pull Requests (PRs) must include a clear description of changes.
+
+- ## ✒️ Authors - X code
+
+### All Members information
+
+* [Marcelo Plinio ](https://github.com/MarceloPlinio)
+* [Thiago Sampaio ](https://github.com/thiagosampaiog)
+* [Caio Renan](https://github.com/Caio-Renan)
+* [Alisson Oliveira](https://github.com/Alisson-Oliver)  
+* [Jaderson Teles](https://github.com/JeerTeles)
+* [Rafael Guerra](https://github.com/rafaelguerrah)
+  
+## 📄 License
+
+This project is under the license (compass Uol - Xcode group)
+
