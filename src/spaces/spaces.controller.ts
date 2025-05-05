@@ -81,7 +81,7 @@ export class SpacesController {
   @ApiResponse({ status: 200, description: 'Space updated successfully', schema: { example: { id: 1, name: 'Updated Conference Room A', description: 'Updated description', capacity: 60 } } })
   @ApiResponse({ status: 400, description: 'Validation error' })
   @Patch(':id')
-  update(@Param('id') id: number, @Body(new ValidationPipe()) dto: UpdateSpaceDto) {
+  async update(@Param('id') id: number, @Body(new ValidationPipe()) dto: UpdateSpaceDto) {
     return this.spacesService.update(id, dto);
   }
 
@@ -90,7 +90,7 @@ export class SpacesController {
   @ApiResponse({ status: 200, description: 'Space deleted successfully' })
   @ApiResponse({ status: 404, description: 'Space not found' })
   @Delete(':id')
-  remove(@Param('id') id: number) {
+  async remove(@Param('id') id: number) {
     return this.spacesService.remove(id);
   }
 }
