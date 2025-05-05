@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Patch, Post, Query, Delete, UseGuards  } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post, Query, Delete, UseGuards, ForbiddenException  } from '@nestjs/common';
 import { ClientsService } from './clients.service';
 import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
@@ -6,11 +6,14 @@ import { FilterClientDto } from './dto/filter-client.dto';
 import { ParamId } from '../common/decorators/param-id.decorator';
 import { ApiTags, ApiOperation, ApiBody, ApiResponse, ApiQuery, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { RolesGuard } from 'src/common/guards/roles.guard';
+import { Role } from 'src/common/enum/roles.enum';
+import { CurrentUser, Roles } from 'src/common/decorators';
 
 @ApiTags('Clients')
 @ApiBearerAuth()
 @Controller('clients')
-@UseGuards(AuthGuard('jwt'))
+@UseGuards(AuthGuard('jwt'), RolesGuard)
 export class ClientsController {
   constructor(private readonly clientsService: ClientsService) {}
 
@@ -36,6 +39,7 @@ export class ClientsController {
   })
   @ApiResponse({ status: 201, description: 'Client created successfully', schema: { example: { id: 1, name: 'Thiago Sampaio', cpf: '123.456.789-00', email: 'thiago.sampaio@compass.com', phone: '+55 (71) 98765-4321', birthDate: '1990-01-01' } } })
   @ApiResponse({ status: 400, description: 'Validation error' })
+  @Roles(Role.ADMIN, Role.USER)
   @Post()
   async create(@Body() dto: CreateClientDto) {
     return this.clientsService.create(dto);
@@ -61,8 +65,17 @@ export class ClientsController {
   })
   @ApiResponse({ status: 200, description: 'Client updated successfully', schema: { example: { id: 1, name: 'Thiago Sampaio Updated', phone: '+55 (71) 91234-5678' } } })
   @ApiResponse({ status: 400, description: 'Validation error' })
+  @Roles(Role.ADMIN, Role.USER)
   @Patch(':id')
-  async updatePartial(@ParamId() id: number, @Body() dto: UpdateClientDto) {
+  async updatePartial(@ParamId() id: number, @Body() dto: UpdateClientDto, @CurrentUser() user: any) {
+
+    if(user.role === Role.USER){
+      const client = await this.clientsService.findById(id);
+      if(client?.userId !== user.id){
+        throw new ForbiddenException('Users can only update their own clients.')
+      }
+    }
+
     return this.clientsService.update(id, dto);
   }
 
@@ -70,6 +83,7 @@ export class ClientsController {
   @ApiQuery({ name: 'name', description: 'Filter by name', required: false, example: 'Thiago Sampaio' })
   @ApiQuery({ name: 'email', description: 'Filter by email', required: false, example: 'thiago.sampaio@compass.com' })
   @ApiResponse({ status: 200, description: 'List of clients', schema: { example: [{ id: 1, name: 'Thiago Sampaio', email: 'thiago.sampaio@compass.com' }] } })
+  @Roles(Role.ADMIN)
   @Get()
   async findAll(@Query() filter: FilterClientDto) {
     return this.clientsService.findAll(filter);
@@ -79,8 +93,14 @@ export class ClientsController {
   @ApiParam({ name: 'id', description: 'Client ID', example: 1 })
   @ApiResponse({ status: 200, description: 'Client found', schema: { example: { id: 1, name: 'Thiago Sampaio', email: 'thiago.sampaio@compass.com' } } })
   @ApiResponse({ status: 404, description: 'Client not found' })
+  @Roles(Role.ADMIN, Role.USER)
   @Get(':id')
-  async findOne(@ParamId() id: number) {
+  async findOne(@ParamId() id: number, @CurrentUser() user: any) {
+    if(user.role === Role.USER){
+      const client = await this.clientsService.findById(id);
+
+      
+    }
     return this.clientsService.findById(id);
   }
 
@@ -88,6 +108,7 @@ export class ClientsController {
   @ApiParam({ name: 'id', description: 'Client ID', example: 1 })
   @ApiResponse({ status: 200, description: 'Client soft deleted successfully' })
   @ApiResponse({ status: 404, description: 'Client not found' })
+  @Roles(Role.ADMIN, Role.USER)
   @Delete(':id')
   async softDelete(@ParamId() id: number) {
     return this.clientsService.softDelete(id);
