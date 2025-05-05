@@ -1,13 +1,14 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Put } from '@nestjs/common';
 import { ResourcesService } from './resources.service';
+import { CreateResourceDto } from './dto/create-resource-dto';
 
 @Controller('resources')
 export class ResourcesController {
   constructor(private readonly resourcesService: ResourcesService) {}
 
   @Post()
-  async create(@Body() data: { name: string; quantity: number; description: string }) {
-    return this.resourcesService.createResource(data);
+  async create(@Body() dto: CreateResourceDto) {
+    return this.resourcesService.createResource(dto);
   }
  
   @Get()
@@ -27,8 +28,8 @@ export class ResourcesController {
   }
 
   @Patch(':id')
-  async update(@Body() data: Partial<{ name: string; quantity: number; description: string }>, @Param('id') id: number) {
-    return this.resourcesService.update(id, data);
+  async update(@Body() dto: CreateResourceDto, @Param('id') id: number) {
+    return this.resourcesService.update(id, dto);
   }
 
   @Delete(':id')
