@@ -96,7 +96,7 @@ npm run dev
 
 #### Npm Run Script's:
 
-I recommend using `Npm run seed` to generate the initial seed with a regular User and an Admin User containing the Login you specified in the .env file.
+Recommended use `Npm run seed` to generate the initial seed with a regular User and an Admin User containing the Login you specified in the .env file.
 
 ```
 Npm run seed
