@@ -96,12 +96,13 @@ export class ClientsController {
   @Roles(Role.ADMIN, Role.USER)
   @Get(':id')
   async findOne(@ParamId() id: number, @CurrentUser() user: any) {
-    if(user.role === Role.USER){
       const client = await this.clientsService.findById(id);
 
-      
-    }
-    return this.clientsService.findById(id);
+      if(user.role === Role.USER && client.userId !== user.id){
+
+        throw new ForbiddenException('Users can only access their own clients.')
+      }
+    return client;
   }
 
   @ApiOperation({ summary: 'Soft delete a client by ID' })
