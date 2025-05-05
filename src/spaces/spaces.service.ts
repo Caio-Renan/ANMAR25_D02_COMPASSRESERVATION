@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { updateSpaceDto } from './dto/update-space-dto'; 
-import type { createSpaceDto } from './dto/create-space-dto';  
+import type { CreateSpaceDto } from './dto/create-space-dto';  
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Space } from '@prisma/client';
 
@@ -11,7 +11,7 @@ export class SpacesService {
   }
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(createSpaceDto: createSpaceDto): Promise<Space> {
+  async create(createSpaceDto: CreateSpaceDto): Promise<Space> {
     const { name, description, capacity } = createSpaceDto;
 
     const existingSpace = await this.prisma.space.findUnique({

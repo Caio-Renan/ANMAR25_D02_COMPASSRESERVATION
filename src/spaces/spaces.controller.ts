@@ -1,5 +1,5 @@
 import { Body, Controller, DefaultValuePipe, Delete, Get, HttpException, HttpStatus, Param, ParseIntPipe, Patch, Post, Query, ValidationPipe, UseGuards } from "@nestjs/common";
-import { createSpaceDto } from "./dto/create-space-dto";
+import { CreateSpaceDto } from "./dto/create-space-dto";
 import { updateSpaceDto } from "./dto/update-space-dto";
 import { SpacesService } from "./spaces.service";
 import { ApiTags, ApiOperation, ApiBody, ApiResponse, ApiParam, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
@@ -15,7 +15,7 @@ export class SpacesController {
 
   @ApiOperation({ summary: 'Create a new space' })
   @ApiBody({
-    type: createSpaceDto,
+    type: CreateSpaceDto,
     examples: {
       default: {
         summary: 'Example Create Space Body',
@@ -34,7 +34,7 @@ export class SpacesController {
   @ApiResponse({ status: 201, description: 'Space created successfully', schema: { example: { id: 1, name: 'Conference Room A', description: 'A large conference room with a projector', capacity: 50 } } })
   @ApiResponse({ status: 400, description: 'Validation error' })
   @Post()
-  async create(@Body() dto: createSpaceDto) {
+  async create(@Body() dto: CreateSpaceDto) {
     try {
       return await this.spacesService.create(dto);
     } catch (error) {
