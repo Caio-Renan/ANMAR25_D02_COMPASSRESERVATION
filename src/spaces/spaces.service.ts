@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
-import { updateSpaceDto } from './dto/update-space-dto'; 
+import { UpdateSpaceDto } from './dto/update-space-dto'; 
 import type { CreateSpaceDto } from './dto/create-space-dto';  
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Space } from '@prisma/client';
@@ -44,7 +44,7 @@ export class SpacesService {
     });
   }
 
-  async update(id: number, updateSpaceDto: updateSpaceDto): Promise<Space> {
+  async update(id: number, updateSpaceDto: UpdateSpaceDto): Promise<Space> {
     return this.prisma.space.update({
       where: { id },
       data: updateSpaceDto,
