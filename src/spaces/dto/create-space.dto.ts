@@ -1,17 +1,15 @@
-import { IsInt, IsNotEmpty, IsString, Min } from "class-validator";
-
-
+import { MinLength, MaxLength } from "class-validator";
+import { IsValidInt, IsGenericString } from 'src/common/decorators';
 export class CreateSpaceDto {
-
-  @IsString()
-  @IsNotEmpty()
+  @IsGenericString()
+  @MinLength(3)
+  @MaxLength(60)
   name: string;
 
-  @IsString()
-  @IsNotEmpty()
+  @IsGenericString()
+  @MaxLength(250)
   description: string;
 
-  @IsInt()
-  @Min(1, { message: "Capacity must be at least 1" })
+  @IsValidInt()
   capacity: number;
 }
