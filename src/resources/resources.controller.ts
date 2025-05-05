@@ -16,6 +16,7 @@ import { UpdateResourceDto } from './dto/update-resource.dto';
 import { ParamId } from 'src/common/decorators/param-id.decorator';
 import { ApiTags, ApiOperation, ApiBody, ApiResponse, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { FilterResourcesDto } from './dto/filter-resources.dto';
 
 
 @ApiTags('Resources')
@@ -78,8 +79,8 @@ export class ResourcesController {
     },
   })
   @Get()
-  async findAll() {
-    return this.resourcesService.findAll();
+  async findAll(@Query() filter: FilterResourcesDto) {
+      return this.resourcesService.findAll(filter);
   }
 
   @ApiOperation({ summary: 'Get a resource by ID' })
