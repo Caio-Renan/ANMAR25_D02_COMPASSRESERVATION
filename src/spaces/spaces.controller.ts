@@ -35,14 +35,7 @@ export class SpacesController {
   @ApiResponse({ status: 400, description: 'Validation error' })
   @Post()
   async create(@Body() dto: CreateSpaceDto) {
-    try {
-      return await this.spacesService.create(dto);
-    } catch (error) {
-      if (error.message === 'Space with this name already exists') {
-        throw new HttpException('Name is already registered.', HttpStatus.BAD_REQUEST);
-      }
-      throw error;
-    }
+    return await this.spacesService.create(dto);
   }
 
   @ApiOperation({ summary: 'Get all spaces' })
