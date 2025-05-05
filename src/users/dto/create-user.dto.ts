@@ -1,4 +1,4 @@
-import { IsPersonName, IsCustomEmail, IsCustomPassword, IsFormattedPhoneNumber } from 'src/common/decorators';
+import { IsPersonName, IsCustomEmail, IsCustomPassword, IsFormattedPhoneNumber } from '../../common/decorators';
 export class CreateUserDTO {
     @IsPersonName()   
     name: string;
