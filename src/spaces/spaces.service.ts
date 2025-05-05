@@ -2,8 +2,9 @@ import { Injectable, NotFoundException, ConflictException } from '@nestjs/common
 import { UpdateSpaceDto } from './dto/update-space.dto'; 
 import type { CreateSpaceDto } from './dto/create-space.dto';  
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Space } from '@prisma/client';
-
+import { Prisma, Space, Status } from '@prisma/client';
+import { FilterSpaceDto } from './dto/filter-space.dto';
+import { getPaginationParams, buildPaginatedResponse } from 'src/common/utils/pagination.util';
 @Injectable()
 export class SpacesService {
 
@@ -29,12 +30,34 @@ export class SpacesService {
     });
   }
 
-  async findAll(skip: number, take: number): Promise<Space[]> {
-    return this.prisma.space.findMany({
-      skip,
-      take,
-    });
+  async findAll(filter: FilterSpaceDto) {
+    const page = parseInt(filter.page?.toString() || '1', 10);
+    const limit = parseInt(filter.limit?.toString() || '10', 10);
+  
+    const { skip, take } = getPaginationParams({ page, limit });
+  
+    const where: Prisma.SpaceWhereInput = {};
+  
+    if (filter.name) {
+      where.name = { contains: filter.name };
+    }
+  
+    if (filter.capacity) {
+      where.capacity = { gte: filter.capacity };
+    }
+  
+    if (filter.status) {
+      where.status = filter.status;
+    }
+  
+    const [data, total] = await Promise.all([
+      this.prisma.space.findMany({ where, skip, take }),
+      this.prisma.space.count({ where }),
+    ]);
+  
+    return buildPaginatedResponse(data, total, page, limit);
   }
+  
 
   async findOne(id: number): Promise<Space | null> {
     const existingSpace = await this.prisma.space.findUnique({
