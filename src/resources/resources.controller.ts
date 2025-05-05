@@ -9,6 +9,7 @@ import {
   Query,
   Put,
   UseGuards,
+  ForbiddenException,
 } from '@nestjs/common';
 import { ResourcesSevice } from './resources.service';
 import { CreateResourceDto } from './dto/create-resource-dto';
@@ -16,14 +17,17 @@ import { UpdateResourceDto } from './dto/update-resource.dto';
 import { ParamId } from 'src/common/decorators/param-id.decorator';
 import { ApiTags, ApiOperation, ApiBody, ApiResponse, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { RolesGuard } from 'src/common/guards/roles.guard';
+import { Role } from 'src/common/enum/roles.enum';
+import { CurrentUser, Roles } from 'src/common/decorators';
 
 
 @ApiTags('Resources')
 @ApiBearerAuth()
 @Controller('resources')
-@UseGuards(AuthGuard('jwt'))
+@UseGuards(AuthGuard('jwt'), RolesGuard)
 export class ResourcesController {
-  constructor(private readonly resourcesService: ResourcesSevice) {}
+  constructor(private readonly resourcesService: ResourcesSevice) { }
 
   @ApiOperation({ summary: 'Create a new resource' })
   @ApiBody({
@@ -56,8 +60,8 @@ export class ResourcesController {
     },
   })
   @ApiResponse({ status: 400, description: 'Validation error' })
+  @Roles(Role.ADMIN)
   @Post()
-
   async create(@Body() dto: CreateResourceDto) {
     return this.resourcesService.create(dto);
   }
@@ -78,6 +82,7 @@ export class ResourcesController {
     },
   })
   @Get()
+  @Roles(Role.ADMIN, Role.USER)
   async findAll() {
     return this.resourcesService.findAll();
   }
@@ -97,6 +102,7 @@ export class ResourcesController {
     },
   })
   @ApiResponse({ status: 404, description: 'Resource not found' })
+  @Roles(Role.ADMIN, Role.USER)
   @Get(':id')
   async findOne(@Param('id') id: number) {
     return this.resourcesService.findOne(id);
@@ -132,6 +138,7 @@ export class ResourcesController {
     },
   })
   @ApiResponse({ status: 400, description: 'Validation error' })
+  @Roles(Role.ADMIN)
   @Patch(':id')
   async update(@Body() dto: CreateResourceDto, @Param('id') id: number) {
     return this.resourcesService.updatePartial(id, dto);
@@ -142,6 +149,7 @@ export class ResourcesController {
   @ApiParam({ name: 'id', description: 'Resource ID', example: 1 })
   @ApiResponse({ status: 200, description: 'Resource soft deleted successfully' })
   @ApiResponse({ status: 404, description: 'Resource not found' })
+  @Roles(Role.ADMIN)
   @Delete(':id')
   async delete(@Param('id') id: number) {
     return this.resourcesService.softDelete(id);
