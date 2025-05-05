@@ -34,9 +34,9 @@ export class SpacesController {
   @ApiResponse({ status: 201, description: 'Space created successfully', schema: { example: { id: 1, name: 'Conference Room A', description: 'A large conference room with a projector', capacity: 50 } } })
   @ApiResponse({ status: 400, description: 'Validation error' })
   @Post()
-  async create(@Body() createSpaceDto: createSpaceDto) {
+  async create(@Body() dto: createSpaceDto) {
     try {
-      return await this.spacesService.create(createSpaceDto);
+      return await this.spacesService.create(dto);
     } catch (error) {
       if (error.message === 'Space with this name already exists') {
         throw new HttpException('Name is already registered.', HttpStatus.BAD_REQUEST);
@@ -94,8 +94,8 @@ export class SpacesController {
   @ApiResponse({ status: 200, description: 'Space updated successfully', schema: { example: { id: 1, name: 'Updated Conference Room A', description: 'Updated description', capacity: 60 } } })
   @ApiResponse({ status: 400, description: 'Validation error' })
   @Patch(':id')
-  update(@Param('id') id: number, @Body(new ValidationPipe()) updateSpaceDto: updateSpaceDto) {
-    return this.spacesService.update(id, updateSpaceDto);
+  update(@Param('id') id: number, @Body(new ValidationPipe()) dto: updateSpaceDto) {
+    return this.spacesService.update(id, dto);
   }
 
   @ApiOperation({ summary: 'Delete a space by ID' })
