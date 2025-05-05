@@ -6,9 +6,7 @@ import { Space } from '@prisma/client';
 
 @Injectable()
 export class SpacesService {
-  count(): any {
-    throw new Error('Method not implemented.');
-  }
+  
   constructor(private readonly prisma: PrismaService) {}
 
   async create(dto: CreateSpaceDto): Promise<Space> {
