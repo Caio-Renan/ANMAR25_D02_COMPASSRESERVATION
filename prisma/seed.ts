@@ -49,7 +49,34 @@ async function main() {
   } else {
     logger.info('default user already exists.');
   }
+
+    const existingAdmin = await prisma.user.findFirst({
+      where: {
+        email: env.DEFAULT_ADMIN_EMAIL,
+      },
+    });
+  
+    if (!existingAdmin) {
+      const hashedPassword = await bcrypt.hash(env.DEFAULT_ADMIN_PASSWORD, 10);
+  
+      await prisma.user.create({
+        data: {
+          name: env.DEFAULT_ADMIN_NAME,
+          email: env.DEFAULT_ADMIN_EMAIL,
+          password: hashedPassword,
+          phone: env.DEFAULT_ADMIN_PHONE,
+          status: 'ACTIVE',
+          role: 'ADMIN', 
+        },
+      });
+  
+      logger.info('admin created');
+    } else {
+      logger.info('admin already exists.');
+    }
 }
+
+
 
 main()
   .catch((e) => {
