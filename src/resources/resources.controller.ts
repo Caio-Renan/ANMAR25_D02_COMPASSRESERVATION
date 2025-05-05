@@ -14,13 +14,13 @@ import {
 import { ResourcesSevice } from './resources.service';
 import { CreateResourceDto } from './dto/create-resource-dto';
 import { UpdateResourceDto } from './dto/update-resource.dto';
-import { ParamId } from 'src/common/decorators/param-id.decorator';
 import { ApiTags, ApiOperation, ApiBody, ApiResponse, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Role } from 'src/common/enum/roles.enum';
 import { CurrentUser, Roles } from 'src/common/decorators';
 import { FilterResourcesDto } from './dto/filter-resources.dto';
+import { IdParamDto } from 'src/common/dto/id-param.dto';
 
 
 @ApiTags('Resources')
@@ -105,8 +105,8 @@ export class ResourcesController {
   @ApiResponse({ status: 404, description: 'Resource not found' })
   @Roles(Role.ADMIN, Role.USER)
   @Get(':id')
-  async findOne(@Param('id') id: number) {
-    return this.resourcesService.findOne(id);
+  async findOne(@Param() params: IdParamDto) {
+    return this.resourcesService.findOne(params.id);
   }
 
   @ApiOperation({ summary: 'Update a resource' })
@@ -141,8 +141,8 @@ export class ResourcesController {
   @ApiResponse({ status: 400, description: 'Validation error' })
   @Roles(Role.ADMIN)
   @Patch(':id')
-  async update(@Body() dto: CreateResourceDto, @Param('id') id: number) {
-    return this.resourcesService.updatePartial(id, dto);
+  async update(@Body() dto: CreateResourceDto, @Param() params: IdParamDto) {
+    return this.resourcesService.updatePartial(params.id, dto);
 
   }
 
@@ -152,7 +152,7 @@ export class ResourcesController {
   @ApiResponse({ status: 404, description: 'Resource not found' })
   @Roles(Role.ADMIN)
   @Delete(':id')
-  async delete(@Param('id') id: number) {
-    return this.resourcesService.softDelete(id);
+  async delete(@Param() params: IdParamDto) {
+    return this.resourcesService.softDelete(params.id);
   }
 }

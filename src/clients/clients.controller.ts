@@ -1,15 +1,14 @@
-import { Body, Controller, Get, Patch, Post, Query, Delete, UseGuards, ForbiddenException  } from '@nestjs/common';
+import { Body, Controller, Param, Get, Patch, Post, Query, Delete, UseGuards, ForbiddenException  } from '@nestjs/common';
 import { ClientsService } from './clients.service';
 import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
 import { FilterClientDto } from './dto/filter-client.dto';
-import { ParamId } from '../common/decorators/param-id.decorator';
 import { ApiTags, ApiOperation, ApiBody, ApiResponse, ApiQuery, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Role } from 'src/common/enum/roles.enum';
 import { CurrentUser, Roles } from 'src/common/decorators';
-
+import { IdParamDto } from 'src/common/dto/id-param.dto';
 @ApiTags('Clients')
 @ApiBearerAuth()
 @Controller('clients')
@@ -67,16 +66,16 @@ export class ClientsController {
   @ApiResponse({ status: 400, description: 'Validation error' })
   @Roles(Role.ADMIN, Role.USER)
   @Patch(':id')
-  async updatePartial(@ParamId() id: number, @Body() dto: UpdateClientDto, @CurrentUser() user: any) {
+  async updatePartial(@Param() params: IdParamDto, @Body() dto: UpdateClientDto, @CurrentUser() user: any) {
 
     if(user.role === Role.USER){
-      const client = await this.clientsService.findById(id);
+      const client = await this.clientsService.findById(params.id);
       if(client?.userId !== user.id){
         throw new ForbiddenException('Users can only update their own clients.')
       }
     }
 
-    return this.clientsService.update(id, dto);
+    return this.clientsService.update(params.id, dto);
   }
 
   @ApiOperation({ summary: 'Get all clients' })
@@ -95,8 +94,8 @@ export class ClientsController {
   @ApiResponse({ status: 404, description: 'Client not found' })
   @Roles(Role.ADMIN, Role.USER)
   @Get(':id')
-  async findOne(@ParamId() id: number, @CurrentUser() user: any) {
-      const client = await this.clientsService.findById(id);
+  async findOne(@Param() params: IdParamDto, @CurrentUser() user: any) {
+      const client = await this.clientsService.findById(params.id);
 
       if(user.role === Role.USER && client.userId !== user.id){
 
@@ -111,7 +110,7 @@ export class ClientsController {
   @ApiResponse({ status: 404, description: 'Client not found' })
   @Roles(Role.ADMIN, Role.USER)
   @Delete(':id')
-  async softDelete(@ParamId() id: number) {
-    return this.clientsService.softDelete(id);
+  async softDelete(@Param() params: IdParamDto) {
+    return this.clientsService.softDelete(params.id);
   }
 }

@@ -29,7 +29,7 @@ import { FilterReservationDto } from './dto/filter-reservation.dto';
 import { CurrentUser, Roles } from 'src/common/decorators';
 import { Role } from 'src/common/enum/roles.enum';
 import { RolesGuard } from 'src/common/guards/roles.guard';
-
+import { IdParamDto } from 'src/common/dto/id-param.dto';
 @ApiTags('Reservations')
 @ApiBearerAuth()
 @Controller('reservations')
@@ -137,8 +137,8 @@ export class ReservationController {
   @ApiResponse({ status: 404, description: 'Reservation not found' })
   @Roles(Role.ADMIN, Role.USER)
   @Get(':id')
-  async findOne(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: any) {
-      const reservation = await this.reservationService.findOne(id);
+  async findOne(@Param() params: IdParamDto, @CurrentUser() user: any) {
+      const reservation = await this.reservationService.findOne(params.id);
 
       if(user.role === Role.USER && reservation?.clientId !== user.id){
         throw new ForbiddenException('Users can only access their own reservations.')
@@ -186,17 +186,17 @@ export class ReservationController {
   @Patch(':id')
   async update(
     @Body() data: UpdateReservationDto,
-    @Param('id', ParseIntPipe) id: number,
+    @Param() params: IdParamDto,
     @CurrentUser() user: any,
   ) {
 
     if(user.role === Role.USER) {
-      const reservation = await this.reservationService.findOne(id);
+      const reservation = await this.reservationService.findOne(params.id);
       if(reservation?.clientId !== user.id){
         throw new ForbiddenException('Users can only update their own reservations. ')
       }
     }
-    return this.reservationService.updatePartial(id, data);
+    return this.reservationService.updatePartial(params.id, data);
   }
 
   @ApiOperation({ summary: 'Delete a reservation by ID' })
@@ -205,7 +205,7 @@ export class ReservationController {
   @ApiResponse({ status: 404, description: 'Reservation not found' })
   @Roles(Role.ADMIN)
   @Delete(':id')
-  async delete(@Param('id', ParseIntPipe) id: number) {
-    return this.reservationService.softDelete(id);
+  async delete(@Param() params: IdParamDto) {
+    return this.reservationService.softDelete(params.id);
   }
 }

@@ -1,9 +1,8 @@
-import { Body, Controller, Get, Patch, Post, Query, Delete, UseGuards, Req, ForbiddenException } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Param, Post, Query, Delete, UseGuards, Req, ForbiddenException } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { UpdateUserDTO } from './dto/update-user.dto';
 import { FilterUserDTO } from './dto/filter-user.dto';
-import { ParamId } from '../common/decorators/param-id.decorator';
 import { ApiTags, ApiOperation, ApiBody, ApiResponse, ApiQuery, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
 import { Roles } from '../common/decorators/roles.decorator';
 import { Role } from '../common/enum/roles.enum';
@@ -12,7 +11,7 @@ import { Request } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { CurrentUser } from 'src/common/decorators';
 import { P } from 'pino';
-
+import { IdParamDto } from 'src/common/dto/id-param.dto';
 @ApiTags('Users')
 @ApiBearerAuth()
 @Controller('users')
@@ -70,12 +69,12 @@ export class UsersController {
   @Roles(Role.ADMIN, Role.USER)
   @Patch(':id')
   async updatePartial(
-    @ParamId() id: number,
+    @Param() params: IdParamDto,
     @Body() dto: UpdateUserDTO,
     @Req() req: Request
   ) {
     const user = req.user as any;  
-    return this.usersService.update(id, dto, user); 
+    return this.usersService.update(params.id, dto, user); 
   }
 
   @ApiOperation({ summary: 'Get all users with optional filters' })
@@ -94,11 +93,11 @@ export class UsersController {
   @ApiResponse({ status: 404, description: 'User not found' })
   @Roles(Role.ADMIN, Role.USER)
   @Get(':id')
-  async findOne(@ParamId() id: number, @CurrentUser() user: any) {
-    if( user.role === Role.USER && user.id !== id){
+  async findOne(@Param() params: IdParamDto, @CurrentUser() user: any) {
+    if( user.role === Role.USER && user.id !== params.id){
       throw new ForbiddenException('Users can only access their own data.')
     }
-    return this.usersService.findById(id);
+    return this.usersService.findById(params.id);
   }
 
   @ApiOperation({ summary: 'Soft delete a user by ID' })
@@ -107,10 +106,10 @@ export class UsersController {
   @ApiResponse({ status: 404, description: 'User not found' })
   @Roles(Role.ADMIN, Role.USER)
   @Delete(':id')
-  async softDelete(@ParamId() id: number, @CurrentUser() user: any) {
-    if (user.role === Role.USER && user.id !== id){
+  async softDelete(@Param() params: IdParamDto, @CurrentUser() user: any) {
+    if (user.role === Role.USER && user.id !== params.id){
       throw new ForbiddenException('Users can only delete their own data.')
     }
-    return this.usersService.softDelete(id);
+    return this.usersService.softDelete(params.id);
   }
 }

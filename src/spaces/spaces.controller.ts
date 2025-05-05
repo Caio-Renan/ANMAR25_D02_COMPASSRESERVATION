@@ -7,7 +7,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { Role } from "src/common/enum/roles.enum";
 import { CurrentUser, Roles } from "src/common/decorators";
 import { RolesGuard } from "src/common/guards/roles.guard";
-
+import { IdParamDto } from "src/common/dto/id-param.dto";
 import { FilterSpaceDto } from "./dto/filter-space.dto";
 @ApiTags('Spaces')
 @ApiBearerAuth()
@@ -67,8 +67,8 @@ export class SpacesController {
   @ApiResponse({ status: 404, description: 'Space not found' })
   @Roles(Role.ADMIN, Role.USER) 
   @Get(':id')
-  async findOne(@Param('id') id: number) {
-    return this.spacesService.findOne(id);
+  async findOne(@Param() params: IdParamDto) {
+    return this.spacesService.findOne(params.id);
   }
 
   @ApiOperation({ summary: 'Update a space' })
@@ -102,8 +102,8 @@ export class SpacesController {
   @ApiResponse({ status: 400, description: 'Validation error' })
   @Roles(Role.ADMIN) 
   @Patch(':id')
-  async update(@Param('id') id: number, @Body(new ValidationPipe()) dto: UpdateSpaceDto) {
-    return this.spacesService.update(id, dto);
+  async update(@Param() params: IdParamDto, @Body(new ValidationPipe()) dto: UpdateSpaceDto) {
+    return this.spacesService.update(params.id, dto);
   }
 
   @ApiOperation({ summary: 'Delete a space by ID' })
@@ -112,7 +112,7 @@ export class SpacesController {
   @ApiResponse({ status: 404, description: 'Space not found' })
   @Roles(Role.ADMIN) 
   @Delete(':id')
-  async delete(@Param('id') id: number) {
-    return this.spacesService.softDelete(id);
+  async delete(@Param() params: IdParamDto) {
+    return this.spacesService.softDelete(params.id);
   }
 }
