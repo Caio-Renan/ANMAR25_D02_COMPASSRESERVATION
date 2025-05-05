@@ -56,11 +56,7 @@ export class SpacesController {
   @ApiResponse({ status: 404, description: 'Space not found' })
   @Get(':id')
   async findOne(@Param('id') id: number) {
-    const space = await this.spacesService.findOne(id);
-
-    
-
-    return space;
+    return this.spacesService.findOne(id);
   }
 
   @ApiOperation({ summary: 'Update a space' })
