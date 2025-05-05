@@ -6,7 +6,7 @@ import { Space } from '@prisma/client';
 
 @Injectable()
 export class SpacesService {
-  
+
   constructor(private readonly prisma: PrismaService) {}
 
   async create(dto: CreateSpaceDto): Promise<Space> {
@@ -37,9 +37,13 @@ export class SpacesService {
   }
 
   async findOne(id: number): Promise<Space | null> {
-    return this.prisma.space.findUnique({
+    const space = await this.prisma.space.findUnique({
       where: { id },
     });
+    if (!space) {
+      throw new NotFoundException('Space not found');
+    }
+    return space
   }
 
   async update(id: number, dto: UpdateSpaceDto): Promise<Space> {

@@ -58,9 +58,7 @@ export class SpacesController {
   async findOne(@Param('id') id: number) {
     const space = await this.spacesService.findOne(id);
 
-    if (!space) {
-      throw new HttpException('Space not found', HttpStatus.NOT_FOUND);
-    }
+    
 
     return space;
   }
