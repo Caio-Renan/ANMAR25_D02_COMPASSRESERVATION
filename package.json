@@ -28,7 +28,8 @@
     "@nestjs/mapped-types": "^2.1.0",
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.0.1",
-    "@nestjs/swagger": "^11.1.5",
+    "@nestjs/swagger": "^11.1.6",
+    "@nestjs/throttler": "^6.4.0",
     "@prisma/client": "^6.7.0",
     "@types/passport": "^1.0.17",
     "ANMAR25_D02_COMPASSRESERVATION": "file:",
@@ -48,7 +49,8 @@
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
     "sqlite3": "^5.1.7",
-    "swagger": "^0.0.1"
+    "swagger": "^0.0.1",
+    "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
@@ -79,7 +81,7 @@
     "ts-loader": "^9.5.2",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.7.3",
+    "typescript": "^5.8.3",
     "typescript-eslint": "^8.20.0"
   },
   "jest": {

@@ -22,6 +22,13 @@ export class CreateReservationResourceDto {
   quantity: number;
 }
 
+export class CreateReservationResourceWrapperDto {
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateReservationResourceDto)
+  create: CreateReservationResourceDto[];
+}
+
 export class CreateReservationDto {
   @IsNotEmpty()
   @IsInt()
@@ -49,5 +56,5 @@ export class CreateReservationDto {
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CreateReservationResourceDto)
-  resources: { create: CreateReservationResourceDto[] };
+  resources: CreateReservationResourceDto[];
 }

@@ -11,7 +11,6 @@ export class CreateResourceDto {
   })
   name: string;
 
-  @IsOptional()
   @IsString()
   @MaxLength(60)
   @Matches(/^$|^[a-zA-Z]{3,}( [a-zA-Z]+)*$/,{
