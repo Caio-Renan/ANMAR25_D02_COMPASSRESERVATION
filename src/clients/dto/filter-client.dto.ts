@@ -1,17 +1,15 @@
-import { IsString, IsOptional, IsEnum, MaxLength, Matches } from 'class-validator';
+import { IsOptional, IsEnum } from 'class-validator';
 import { Status } from '@prisma/client';
 import { PaginationDto } from '../../common/dto/pagination.dto';
+import { IsPersonName, IsCustomEmail } from 'src/common/decorators';
 
 export class FilterClientDto extends PaginationDto {
-  @IsString()
   @IsOptional()
-  @MaxLength(100)
-  @Matches(/^[A-Za-zÀ-ÿ\s.'-]+$/, { message: 'name must contain only letters, spaces, dots, apostrophes, or hyphens.' })
+  @IsPersonName()
   name?: string;
 
-  @IsString()
   @IsOptional()
-  @MaxLength(150)
+  @IsCustomEmail()
   email?: string;
 
   @IsEnum(Status)
