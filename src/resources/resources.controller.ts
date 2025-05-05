@@ -59,7 +59,7 @@ export class ResourcesController {
   @Post()
 
   async create(@Body() dto: CreateResourceDto) {
-    return this.resourcesService.createResource(dto);
+    return this.resourcesService.create(dto);
   }
 
   @ApiOperation({ summary: 'Get all resources' })
@@ -134,7 +134,7 @@ export class ResourcesController {
   @ApiResponse({ status: 400, description: 'Validation error' })
   @Patch(':id')
   async update(@Body() dto: CreateResourceDto, @Param('id') id: number) {
-    return this.resourcesService.update(id, dto);
+    return this.resourcesService.updatePartial(id, dto);
 
   }
 
