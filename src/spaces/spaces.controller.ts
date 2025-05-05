@@ -4,7 +4,7 @@ import { UpdateSpaceDto } from "./dto/update-space.dto";
 import { SpacesService } from "./spaces.service";
 import { ApiTags, ApiOperation, ApiBody, ApiResponse, ApiParam, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
-
+import { FilterSpaceDto } from "./dto/filter-space.dto";
 @ApiTags('Spaces')
 @ApiBearerAuth()
 
@@ -43,11 +43,8 @@ export class SpacesController {
   @ApiQuery({ name: 'limit', description: 'Number of items per page', required: false, example: 10 })
   @ApiResponse({ status: 200, description: 'List of spaces', schema: { example: [{ id: 1, name: 'Conference Room A', description: 'A large conference room with a projector', capacity: 50 }] } })
   @Get()
-  async findAll(
-    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
-    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
-  ) {
-    return this.spacesService.findAll(page, limit);
+  async findAll(@Query() filter: FilterSpaceDto) {
+      return this.spacesService.findAll(filter);
   }
 
   @ApiOperation({ summary: 'Get a space by ID' })
