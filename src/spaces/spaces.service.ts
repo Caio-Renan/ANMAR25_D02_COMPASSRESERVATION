@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
-import { UpdateSpaceDto } from './dto/update-space-dto'; 
-import type { CreateSpaceDto } from './dto/create-space-dto';  
+import { UpdateSpaceDto } from './dto/update-space.dto'; 
+import type { CreateSpaceDto } from './dto/create-space.dto';  
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Space } from '@prisma/client';
 

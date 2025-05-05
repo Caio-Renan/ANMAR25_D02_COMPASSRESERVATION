@@ -1,6 +1,6 @@
 import { Body, Controller, DefaultValuePipe, Delete, Get, HttpException, HttpStatus, Param, ParseIntPipe, Patch, Post, Query, ValidationPipe, UseGuards } from "@nestjs/common";
-import { CreateSpaceDto } from "./dto/create-space-dto";
-import { UpdateSpaceDto } from "./dto/update-space-dto";
+import { CreateSpaceDto } from "./dto/create-space.dto";
+import { UpdateSpaceDto } from "./dto/update-space.dto";
 import { SpacesService } from "./spaces.service";
 import { ApiTags, ApiOperation, ApiBody, ApiResponse, ApiParam, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';

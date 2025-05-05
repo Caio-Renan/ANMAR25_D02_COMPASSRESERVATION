@@ -2,7 +2,7 @@
 import { Status } from "@prisma/client";
 import { IsEnum, IsInt, IsNotEmpty, IsOptional, IsString, Min } from "class-validator";
 import { PartialType } from "@nestjs/mapped-types";
-import { CreateSpaceDto } from "./create-space-dto";
+import { CreateSpaceDto } from "./create-space.dto";
 
 export class ListSpaceDto extends PartialType(CreateSpaceDto){
 
