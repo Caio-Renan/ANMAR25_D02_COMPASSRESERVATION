@@ -1,4 +1,4 @@
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
   IsArray,
   IsDate,
@@ -40,11 +40,13 @@ export class CreateReservationDto {
 
   @IsNotEmpty()
   @IsDate()
+  @Transform(({ value }) => new Date(value), { toClassOnly: true })
   @Type(() => Date)
   startDate: Date;
 
   @IsNotEmpty()
   @IsDate()
+  @Transform(({ value }) => new Date(value), { toClassOnly: true })
   @Type(() => Date)
   endDate: Date;
 
