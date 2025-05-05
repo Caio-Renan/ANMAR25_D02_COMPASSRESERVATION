@@ -77,8 +77,12 @@ export class ReservationService {
       where.status = filter.status;
     }
 
-    if ( filter.name || filter.phone) {
+    if (filter.cpf || filter.name || filter.phone) {
       where.client = {};
+
+      if (filter.cpf) {
+        where.client.cpf = filter.cpf;
+      }
 
       if (filter.name) {
         where.client.name = {
@@ -110,8 +114,9 @@ export class ReservationService {
           client: {
             select: {
               name: true,
+              cpf: true,
               email: true,
-              phone: true
+              phone: true,
             },
           },
           space: {
