@@ -15,14 +15,8 @@ import { Prisma, Reservation, ReservationStatus } from '@prisma/client';
 import { UpdateReservationDto } from './dto/update-reservation-dto';
 import ical from 'ical-generator';
 import { EmailService } from 'src/email/email.service';
-
-interface FindAllReservationsOptions {
-  page: number;
-  limit: number;
-  cpf?: string;
-  status?: ReservationStatus;
-}
-
+import { FilterReservationDto } from './dto/filter-reservation.dto';
+import { getPaginationParams, buildPaginatedResponse } from 'src/common/utils/pagination.util';
 @Injectable()
 export class ReservationService {
   constructor(
@@ -68,36 +62,74 @@ export class ReservationService {
     });
   }
 
-  async findAll({ page, limit, cpf, status }: FindAllReservationsOptions) {
-    const skip = (page - 1) * limit;
+  async findAll(filter: FilterReservationDto) {
+    const page = parseInt(filter.page?.toString() || '1', 10);
+    const limit = parseInt(filter.limit?.toString() || '10', 10);
+    
+    const { skip, take } = getPaginationParams({ page, limit});
+          
+    const where: Prisma.ReservationWhereInput = {};
 
-    const where: any = {};
-
-    if (status) {
-      where.status = status;
+    if (filter.status) {
+      where.status = filter.status;
     }
 
-    if (cpf) {
-      where.client = {
-        cpf: cpf,
+    if (filter.cpf || filter.name || filter.phone) {
+      where.client = {};
+
+      if (filter.cpf) {
+        where.client.cpf = filter.cpf;
+      }
+
+      if (filter.name) {
+        where.client.name = {
+          contains: filter.name
+        };
+      }
+
+      if (filter.phone) {
+        where.client.phone = {
+          contains: filter.phone
+        };
+      }
+    }
+
+    if (filter.spaceName) {
+      where.space = {
+        name: {
+          contains: filter.spaceName
+        },
       };
     }
 
-    const [data, total] = await this.prisma.$transaction([
+    const [data, total] = await Promise.all([
       this.prisma.reservation.findMany({
         where,
         skip,
-        take: limit,
+        take,
+        include: {
+          client: {
+            select: {
+              name: true,
+              cpf: true,
+              email: true,
+              phone: true,
+              status: true,
+              createdAt: true,
+              updatedAt: true
+            }
+          },
+          space: {
+            select: {
+              name: true
+            }
+          }
+        }
       }),
       this.prisma.reservation.count({ where }),
     ]);
 
-    return {
-      total,
-      page,
-      lastPage: Math.ceil(total / limit),
-      data,
-    };
+    return buildPaginatedResponse(data, total, page, limit);
   }
 
   async findOne(id: number): Promise<Reservation | null> {
