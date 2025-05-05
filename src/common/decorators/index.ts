@@ -8,3 +8,4 @@ export * from './is-valid-id.decorator';
 export * from './is-valid-int.decorator';
 export * from './roles.decorator'
 export * from './current-user.decorator'
+export * from './is-generic-name.decorator'
