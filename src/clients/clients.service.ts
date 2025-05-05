@@ -33,7 +33,7 @@ export class ClientsService {
     private readonly emailService: EmailService,
   ) { }
 
-  async create(dto: CreateClientDto): Promise<Client> {
+  async create(dto: CreateClientDto, userId: number): Promise<Client> {
     const existingCpf = await this.prisma.client.findUnique({ where: { cpf: dto.cpf } });
     if (existingCpf) throw new ConflictException('CPF already registered');
 
@@ -46,6 +46,7 @@ export class ClientsService {
     const client = await this.prisma.client.create({
       data: {
         ...dto,
+        user: { connect: { id: userId } },
         status: 'ACTIVE',
       },
       select: clientSelect,
