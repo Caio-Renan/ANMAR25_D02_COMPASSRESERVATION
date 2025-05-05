@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   Param,
   ParseIntPipe,
@@ -25,11 +26,14 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { ReservationStatus } from '@prisma/client';
 import { FilterReservationDto } from './dto/filter-reservation.dto';
+import { CurrentUser, Roles } from 'src/common/decorators';
+import { Role } from 'src/common/enum/roles.enum';
+import { RolesGuard } from 'src/common/guards/roles.guard';
 
 @ApiTags('Reservations')
 @ApiBearerAuth()
 @Controller('reservations')
-@UseGuards(AuthGuard('jwt'))
+@UseGuards(AuthGuard('jwt'), RolesGuard)
 export class ReservationController {
   constructor(private readonly reservationService: ReservationService) {}
 
@@ -66,6 +70,7 @@ export class ReservationController {
     },
   })
   @ApiResponse({ status: 400, description: 'Validation error' })
+  @Roles(Role.ADMIN, Role.USER)
   @Post()
   async create(@Body() data: CreateReservationDto) {
     return this.reservationService.create(data);
@@ -109,6 +114,7 @@ export class ReservationController {
     },
   })
   @Get()
+  @Roles(Role.ADMIN)
   async findAll(@Query() filter: FilterReservationDto) {
     return this.reservationService.findAll(filter);
   }
@@ -129,9 +135,17 @@ export class ReservationController {
     },
   })
   @ApiResponse({ status: 404, description: 'Reservation not found' })
+  @Roles(Role.ADMIN, Role.USER)
   @Get(':id')
-  async findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.reservationService.findOne(id);
+  async findOne(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: any) {
+      const reservation = await this.reservationService.findOne(id);
+
+      if(user.role === Role.USER && reservation?.clientId !== user.id){
+        throw new ForbiddenException('Users can only access their own reservations.')
+      }
+
+      return reservation;
+  
   }
 
   @ApiOperation({ summary: 'Update a reservation' })
@@ -168,11 +182,20 @@ export class ReservationController {
   })
   @ApiResponse({ status: 400, description: 'Validation error' })
   @ApiResponse({ status: 404, description: 'Reservation not found' })
+  @Roles(Role.ADMIN, Role.USER)
   @Patch(':id')
   async update(
     @Body() data: UpdateReservationDto,
     @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: any,
   ) {
+
+    if(user.role === Role.USER) {
+      const reservation = await this.reservationService.findOne(id);
+      if(reservation?.clientId !== user.id){
+        throw new ForbiddenException('Users can only update their own reservations. ')
+      }
+    }
     return this.reservationService.updatePartial(id, data);
   }
 
@@ -180,6 +203,7 @@ export class ReservationController {
   @ApiParam({ name: 'id', description: 'Reservation ID', example: 1 })
   @ApiResponse({ status: 200, description: 'Reservation deleted successfully' })
   @ApiResponse({ status: 404, description: 'Reservation not found' })
+  @Roles(Role.ADMIN)
   @Delete(':id')
   async delete(@Param('id', ParseIntPipe) id: number) {
     return this.reservationService.softDelete(id);

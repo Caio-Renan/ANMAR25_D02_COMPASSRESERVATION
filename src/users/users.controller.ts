@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Patch, Post, Query, Delete, UseGuards, Req } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post, Query, Delete, UseGuards, Req, ForbiddenException } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { UpdateUserDTO } from './dto/update-user.dto';
@@ -10,6 +10,8 @@ import { Role } from '../common/enum/roles.enum';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Request } from 'express';
 import { AuthGuard } from '@nestjs/passport';
+import { CurrentUser } from 'src/common/decorators';
+import { P } from 'pino';
 
 @ApiTags('Users')
 @ApiBearerAuth()
@@ -90,18 +92,25 @@ export class UsersController {
   @ApiParam({ name: 'id', description: 'User ID', example: 1 })
   @ApiResponse({ status: 200, description: 'User found', schema: { example: { id: 1, name: 'Thiago Sampaio', email: 'Thiago.sampaio@compass.com' } } })
   @ApiResponse({ status: 404, description: 'User not found' })
-  @Roles(Role.ADMIN)
+  @Roles(Role.ADMIN, Role.USER)
   @Get(':id')
-  async findOne(@ParamId() id: number) {
+  async findOne(@ParamId() id: number, @CurrentUser() user: any) {
+    if( user.role === Role.USER && user.id !== id){
+      throw new ForbiddenException('Users can only access their own data.')
+    }
     return this.usersService.findById(id);
   }
+
   @ApiOperation({ summary: 'Soft delete a user by ID' })
   @ApiParam({ name: 'id', description: 'User ID', example: 1 })
   @ApiResponse({ status: 200, description: 'User soft deleted successfully' })
   @ApiResponse({ status: 404, description: 'User not found' })
-  @Roles(Role.ADMIN)
+  @Roles(Role.ADMIN, Role.USER)
   @Delete(':id')
-  async softDelete(@ParamId() id: number) {
+  async softDelete(@ParamId() id: number, @CurrentUser() user: any) {
+    if (user.role === Role.USER && user.id !== id){
+      throw new ForbiddenException('Users can only delete their own data.')
+    }
     return this.usersService.softDelete(id);
   }
 }
