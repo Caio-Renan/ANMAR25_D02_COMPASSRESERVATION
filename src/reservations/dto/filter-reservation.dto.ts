@@ -9,24 +9,6 @@ export class FilterReservationDto extends PaginationDto {
   @MaxLength(100)
   @Matches(/^[A-Za-zÀ-ÿ\s.'-]+$/, { message: 'name must contain only letters, spaces, dots, apostrophes, or hyphens.' })
   name?: string;
-  
-  @IsOptional()
-  @IsNotEmpty()
-  @IsString()
-  @Length(11, 14)
-  @Transform(({ value }) => {
-    if (typeof value !== 'string') return value;
-  
-    const digits = value.replace(/\D/g, '');
-  
-    if (digits.length !== 11) return value;
-  
-    return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6, 9)}-${digits.slice(9)}`;
-  })
-  @Matches(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/, {
-    message: 'cpf must be in the format 000.000.000-00'
-  })
-  cpf?: string;
 
   @IsOptional()
     @IsString()
