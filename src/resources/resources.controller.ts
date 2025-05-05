@@ -6,16 +6,21 @@ import {
   Param,
   Patch,
   Post,
+  Query,
+  Put,
+  UseGuards,
 } from '@nestjs/common';
 import { ResourcesSevice } from './resources.service';
 import { CreateResourceDto } from './dto/create-resource-dto';
 import { UpdateResourceDto } from './dto/update-resource.dto';
 import { ParamId } from 'src/common/decorators/param-id.decorator';
 import { ApiTags, ApiOperation, ApiBody, ApiResponse, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('Resources')
 @ApiBearerAuth()
 @Controller('resources')
+@UseGuards(AuthGuard('jwt'))
 export class ResourcesController {
   constructor(private readonly resourcesService: ResourcesSevice) {}
 
