@@ -11,10 +11,17 @@ import {
   CreateReservationResourceDto,
 } from './dto/create-reservation-dto';
 import { ReservationValidationService } from './reservationsValidate.service';
-import { Prisma, Reservation } from '@prisma/client';
+import { Prisma, Reservation, ReservationStatus } from '@prisma/client';
 import { UpdateReservationDto } from './dto/update-reservation-dto';
 import ical from 'ical-generator';
 import { EmailService } from 'src/email/email.service';
+
+interface FindAllReservationsOptions {
+  page: number;
+  limit: number;
+  cpf?: string;
+  status?: ReservationStatus;
+}
 
 @Injectable()
 export class ReservationService {
@@ -61,8 +68,36 @@ export class ReservationService {
     });
   }
 
-  async findAll(): Promise<Reservation[]> {
-    return this.prisma.reservation.findMany();
+  async findAll({ page, limit, cpf, status }: FindAllReservationsOptions) {
+    const skip = (page - 1) * limit;
+
+    const where: any = {};
+
+    if (status) {
+      where.status = status;
+    }
+
+    if (cpf) {
+      where.client = {
+        cpf: cpf,
+      };
+    }
+
+    const [data, total] = await this.prisma.$transaction([
+      this.prisma.reservation.findMany({
+        where,
+        skip,
+        take: limit,
+      }),
+      this.prisma.reservation.count({ where }),
+    ]);
+
+    return {
+      total,
+      page,
+      lastPage: Math.ceil(total / limit),
+      data,
+    };
   }
 
   async findOne(id: number): Promise<Reservation | null> {

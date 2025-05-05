@@ -7,13 +7,23 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { ReservationService } from './reservations.service';
 import { CreateReservationDto } from './dto/create-reservation-dto';
 import { UpdateReservationDto } from './dto/update-reservation-dto';
-import { ApiTags, ApiOperation, ApiBody, ApiResponse, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiBody,
+  ApiResponse,
+  ApiParam,
+  ApiBearerAuth,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { ReservationStatus } from '@prisma/client';
 
 @ApiTags('Reservations')
 @ApiBearerAuth()
@@ -41,7 +51,19 @@ export class ReservationController {
       },
     },
   })
-  @ApiResponse({ status: 201, description: 'Reservation created successfully', schema: { example: { id: 1, clientId: 1, spaceId: 101, startDate: '2025-05-01', endDate: '2025-05-05' } } })
+  @ApiResponse({
+    status: 201,
+    description: 'Reservation created successfully',
+    schema: {
+      example: {
+        id: 1,
+        clientId: 1,
+        spaceId: 101,
+        startDate: '2025-05-01',
+        endDate: '2025-05-05',
+      },
+    },
+  })
   @ApiResponse({ status: 400, description: 'Validation error' })
   @Post()
   async create(@Body() data: CreateReservationDto) {
@@ -49,15 +71,72 @@ export class ReservationController {
   }
 
   @ApiOperation({ summary: 'Get all reservations' })
-  @ApiResponse({ status: 200, description: 'List of reservations', schema: { example: [{ id: 1, clientId: 1, spaceId: 101, startDate: '2025-05-01', endDate: '2025-05-05' }] } })
+  @ApiQuery({
+    name: 'cpf',
+    required: false,
+    type: String,
+    description: 'CPF (optional)',
+  })
+  @ApiQuery({
+    name: 'status',
+    required: false,
+    enum: ReservationStatus,
+    description: 'Booking status (optional)',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'List of reservations',
+    schema: {
+      example: {
+        total: 1,
+        page: 1,
+        lastPage: 1,
+        data: [
+          {
+            id: 1,
+            clientId: 1,
+            spaceId: 1,
+            startDate: '2025-04-12T00:00:00.000Z',
+            endDate: '2025-04-13T00:00:00.000Z',
+            status: 'OPEN',
+            createdAt: '2025-05-04T18:56:17.645Z',
+            updatedAt: '2025-05-04T18:56:17.645Z',
+            closedAt: null,
+          },
+        ],
+      },
+    },
+  })
   @Get()
-  async findAll() {
-    return this.reservationService.findAll();
+  async findAll(
+    @Query('page') page = '1',
+    @Query('limit') limit = '10',
+    @Query('cpf') cpf?: string,
+    @Query('status') status?: ReservationStatus,
+  ) {
+    return this.reservationService.findAll({
+      page: parseInt(page),
+      limit: parseInt(limit),
+      cpf,
+      status,
+    });
   }
 
   @ApiOperation({ summary: 'Get a reservation by ID' })
   @ApiParam({ name: 'id', description: 'Reservation ID', example: 1 })
-  @ApiResponse({ status: 200, description: 'Reservation found', schema: { example: { id: 1, clientId: 1, spaceId: 101, startDate: '2025-05-01', endDate: '2025-05-05' } } })
+  @ApiResponse({
+    status: 200,
+    description: 'Reservation found',
+    schema: {
+      example: {
+        id: 1,
+        clientId: 1,
+        spaceId: 101,
+        startDate: '2025-05-01',
+        endDate: '2025-05-05',
+      },
+    },
+  })
   @ApiResponse({ status: 404, description: 'Reservation not found' })
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number) {
@@ -83,7 +162,19 @@ export class ReservationController {
       },
     },
   })
-  @ApiResponse({ status: 200, description: 'Reservation updated successfully', schema: { example: { id: 1, clientId: 1, spaceId: 102, startDate: '2025-05-02', endDate: '2025-05-06' } } })
+  @ApiResponse({
+    status: 200,
+    description: 'Reservation updated successfully',
+    schema: {
+      example: {
+        id: 1,
+        clientId: 1,
+        spaceId: 102,
+        startDate: '2025-05-02',
+        endDate: '2025-05-06',
+      },
+    },
+  })
   @ApiResponse({ status: 400, description: 'Validation error' })
   @ApiResponse({ status: 404, description: 'Reservation not found' })
   @Put(':id')
