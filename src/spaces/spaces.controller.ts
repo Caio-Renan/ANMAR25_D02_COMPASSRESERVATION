@@ -8,6 +8,7 @@ import { Role } from "src/common/enum/roles.enum";
 import { CurrentUser, Roles } from "src/common/decorators";
 import { RolesGuard } from "src/common/guards/roles.guard";
 
+import { FilterSpaceDto } from "./dto/filter-space.dto";
 @ApiTags('Spaces')
 @ApiBearerAuth()
 @Controller('spaces')
@@ -56,11 +57,8 @@ export class SpacesController {
   })
   @Roles(Role.ADMIN, Role.USER) 
   @Get()
-  async findAll(
-    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
-    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
-  ) {
-    return this.spacesService.findAll(page, limit);
+  async findAll(@Query() filter: FilterSpaceDto) {
+      return this.spacesService.findAll(filter);
   }
 
   @ApiOperation({ summary: 'Get a space by ID' })

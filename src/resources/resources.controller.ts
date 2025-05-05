@@ -20,6 +20,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Role } from 'src/common/enum/roles.enum';
 import { CurrentUser, Roles } from 'src/common/decorators';
+import { FilterResourcesDto } from './dto/filter-resources.dto';
 
 
 @ApiTags('Resources')
@@ -83,8 +84,8 @@ export class ResourcesController {
   })
   @Get()
   @Roles(Role.ADMIN, Role.USER)
-  async findAll() {
-    return this.resourcesService.findAll();
+  async findAll(@Query() filter: FilterResourcesDto) {
+      return this.resourcesService.findAll(filter);
   }
 
   @ApiOperation({ summary: 'Get a resource by ID' })

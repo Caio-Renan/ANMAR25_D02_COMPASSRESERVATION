@@ -51,7 +51,6 @@ export class ClientsService {
       select: clientSelect,
     });
 
-
     const token = this.jwtService.sign(
       { id: client.id },
       {
@@ -62,15 +61,11 @@ export class ClientsService {
       }
     );
 
-
     const validationUrl = `${process.env.APP_URL}/auth/verify-email??token=${token}`
 
     await this.emailService.sendEmailVerification(client.email, client.name, validationUrl)
 
-
     return client;
-
-
 
   }
 
@@ -113,6 +108,7 @@ export class ClientsService {
     if (filter.name) where.name = { contains: filter.name };
     if (filter.email) where.email = { contains: filter.email };
     if (filter.status) where.status = filter.status;
+    if (filter.cpf) where.cpf = { contains: filter.cpf };
 
     const [data, total] = await Promise.all([
       this.prisma.client.findMany({

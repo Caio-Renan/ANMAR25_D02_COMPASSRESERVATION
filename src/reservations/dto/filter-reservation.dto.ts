@@ -1,32 +1,14 @@
-import { IsString, IsOptional, IsEnum, IsNotEmpty, MaxLength, Matches, Length, IsPhoneNumber } from 'class-validator';
+import { IsString, IsOptional, IsEnum, IsNotEmpty, MaxLength, Matches, IsPhoneNumber } from 'class-validator';
 import { ReservationStatus } from '@prisma/client';
 import { PaginationDto } from '../../common/dto/pagination.dto'
 import { Transform } from 'class-transformer';
-
+import { IsCpf } from 'src/common/decorators';
 export class FilterReservationDto extends PaginationDto {
   @IsString()
   @IsOptional()
   @MaxLength(100)
   @Matches(/^[A-Za-zÀ-ÿ\s.'-]+$/, { message: 'name must contain only letters, spaces, dots, apostrophes, or hyphens.' })
   name?: string;
-  
-  @IsOptional()
-  @IsNotEmpty()
-  @IsString()
-  @Length(11, 14)
-  @Transform(({ value }) => {
-    if (typeof value !== 'string') return value;
-  
-    const digits = value.replace(/\D/g, '');
-  
-    if (digits.length !== 11) return value;
-  
-    return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6, 9)}-${digits.slice(9)}`;
-  })
-  @Matches(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/, {
-    message: 'cpf must be in the format 000.000.000-00'
-  })
-  cpf?: string;
 
   @IsOptional()
     @IsString()
@@ -75,4 +57,7 @@ export class FilterReservationDto extends PaginationDto {
   @IsNotEmpty()
   spaceName?: string;
 
+  @IsCpf()
+  @IsOptional()
+  cpf?: string;
 }
