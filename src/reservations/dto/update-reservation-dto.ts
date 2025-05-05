@@ -1,21 +1,19 @@
 import { Type, Transform } from 'class-transformer';
 import { IsDate, IsOptional, IsString, IsIn } from 'class-validator';
-
+import { IsValidId, IsValidInt, IsGenericDate, IsGenericString } from 'src/common/decorators';
 export class UpdateReservationDto {
   @IsOptional()
-  @IsDate()
   @Transform(({ value }) => new Date(value), { toClassOnly: true })
-  @Type(() => Date)
+  @IsGenericDate()
   startDate?: Date;
 
   @IsOptional()
-  @IsDate()
   @Transform(({ value }) => new Date(value), { toClassOnly: true })
-  @Type(() => Date)
+  @IsGenericDate()
   endDate?: Date;
 
   @IsOptional()
-  @IsString()
+  @IsGenericString()
   @IsIn(['OPEN', 'APPROVED', 'CLOSED', 'CANCELED'])
   status?: string;
 }

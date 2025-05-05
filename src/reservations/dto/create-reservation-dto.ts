@@ -10,15 +10,12 @@ import {
   Min,
   ValidateNested,
 } from 'class-validator';
-
+import { IsValidId, IsValidInt, IsGenericDate, IsGenericString } from 'src/common/decorators';
 export class CreateReservationResourceDto {
-  @IsNotEmpty()
-  @IsInt()
+  @IsValidId()
   resourceId: number;
 
-  @IsNotEmpty()
-  @IsInt()
-  @Min(1)
+  @IsValidInt()
   quantity: number;
 }
 
@@ -30,28 +27,22 @@ export class CreateReservationResourceWrapperDto {
 }
 
 export class CreateReservationDto {
-  @IsNotEmpty()
-  @IsInt()
+  @IsValidId()
   clientId: number;
 
-  @IsNotEmpty()
-  @IsInt()
+  @IsValidInt()
   spaceId: number;
 
-  @IsNotEmpty()
-  @IsDate()
   @Transform(({ value }) => new Date(value), { toClassOnly: true })
-  @Type(() => Date)
+  @IsGenericDate()
   startDate: Date;
 
-  @IsNotEmpty()
-  @IsDate()
   @Transform(({ value }) => new Date(value), { toClassOnly: true })
-  @Type(() => Date)
+  @IsGenericDate()
   endDate: Date;
 
   @IsOptional()
-  @IsString()
+  @IsGenericString()
   @IsIn(['OPEN', 'APPROVED', 'CLOSED', 'CANCELED'])
   status?: string;
 
