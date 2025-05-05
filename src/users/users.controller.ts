@@ -4,12 +4,12 @@ import { CreateUserDTO } from './dto/create-user.dto';
 import { UpdateUserDTO } from './dto/update-user.dto';
 import { FilterUserDTO } from './dto/filter-user.dto';
 import { ParamId } from '../common/decorators/param-id.decorator';
-import { AuthGuard } from 'src/common/guards/auth.guard';
 import { ApiTags, ApiOperation, ApiBody, ApiResponse, ApiQuery, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
 import { Roles } from '../common/decorators/roles.decorator';
 import { Role } from '../common/enum/roles.enum';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Request } from 'express';
+import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('Users')
 @ApiBearerAuth()
