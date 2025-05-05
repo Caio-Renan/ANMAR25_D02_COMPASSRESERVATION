@@ -1,7 +1,7 @@
 import { IsInt, IsNotEmpty, IsString, Min } from "class-validator";
 
 
-export class createSpaceDto {
+export class CreateSpaceDto {
 
   @IsString()
   @IsNotEmpty()

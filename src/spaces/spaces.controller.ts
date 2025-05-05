@@ -1,6 +1,6 @@
 import { Body, Controller, DefaultValuePipe, Delete, Get, HttpException, HttpStatus, Param, ParseIntPipe, Patch, Post, Query, ValidationPipe, UseGuards } from "@nestjs/common";
-import { createSpaceDto } from "./dto/create-space-dto";
-import { updateSpaceDto } from "./dto/update-space-dto";
+import { CreateSpaceDto } from "./dto/create-space.dto";
+import { UpdateSpaceDto } from "./dto/update-space.dto";
 import { SpacesService } from "./spaces.service";
 import { ApiTags, ApiOperation, ApiBody, ApiResponse, ApiParam, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
@@ -15,7 +15,7 @@ export class SpacesController {
 
   @ApiOperation({ summary: 'Create a new space' })
   @ApiBody({
-    type: createSpaceDto,
+    type: CreateSpaceDto,
     examples: {
       default: {
         summary: 'Example Create Space Body',
@@ -34,15 +34,8 @@ export class SpacesController {
   @ApiResponse({ status: 201, description: 'Space created successfully', schema: { example: { id: 1, name: 'Conference Room A', description: 'A large conference room with a projector', capacity: 50 } } })
   @ApiResponse({ status: 400, description: 'Validation error' })
   @Post()
-  async create(@Body() createSpaceDto: createSpaceDto) {
-    try {
-      return await this.spacesService.create(createSpaceDto);
-    } catch (error) {
-      if (error.message === 'Space with this name already exists') {
-        throw new HttpException('Name is already registered.', HttpStatus.BAD_REQUEST);
-      }
-      throw error;
-    }
+  async create(@Body() dto: CreateSpaceDto) {
+    return await this.spacesService.create(dto);
   }
 
   @ApiOperation({ summary: 'Get all spaces' })
@@ -62,20 +55,14 @@ export class SpacesController {
   @ApiResponse({ status: 200, description: 'Space found', schema: { example: { id: 1, name: 'Conference Room A', description: 'A large conference room with a projector', capacity: 50 } } })
   @ApiResponse({ status: 404, description: 'Space not found' })
   @Get(':id')
-  async findOne(@Param('id') id: string) {
-    const space = await this.spacesService.findOne(id);
-
-    if (!space) {
-      throw new HttpException('Space not found', HttpStatus.NOT_FOUND);
-    }
-
-    return space;
+  async findOne(@Param('id') id: number) {
+    return this.spacesService.findOne(id);
   }
 
   @ApiOperation({ summary: 'Update a space' })
   @ApiParam({ name: 'id', description: 'Space ID', example: 1 })
   @ApiBody({
-    type: updateSpaceDto,
+    type: UpdateSpaceDto,
     examples: {
       default: {
         summary: 'Example Update Space Body',
@@ -94,8 +81,8 @@ export class SpacesController {
   @ApiResponse({ status: 200, description: 'Space updated successfully', schema: { example: { id: 1, name: 'Updated Conference Room A', description: 'Updated description', capacity: 60 } } })
   @ApiResponse({ status: 400, description: 'Validation error' })
   @Patch(':id')
-  update(@Param('id') id: string, @Body(new ValidationPipe()) updateSpaceDto: updateSpaceDto) {
-    return this.spacesService.update(id, updateSpaceDto);
+  async update(@Param('id') id: number, @Body(new ValidationPipe()) dto: UpdateSpaceDto) {
+    return this.spacesService.update(id, dto);
   }
 
   @ApiOperation({ summary: 'Delete a space by ID' })
@@ -103,7 +90,7 @@ export class SpacesController {
   @ApiResponse({ status: 200, description: 'Space deleted successfully' })
   @ApiResponse({ status: 404, description: 'Space not found' })
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.spacesService.remove(id);
+  async delete(@Param('id') id: number) {
+    return this.spacesService.softDelete(id);
   }
 }
