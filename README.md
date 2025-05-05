@@ -126,8 +126,9 @@ src/
 ├── users/            # Users module
 └── main.ts           # Application entry point
 ```
+---
 
-#Start the project in development mode:
+# Start the project in development mode:
 
 ```bash
 npm run dev
