@@ -5,8 +5,8 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
-  Put,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -110,7 +110,7 @@ export class ReservationController {
   })
   @Get()
   async findAll(@Query() filter: FilterReservationDto) {
-      return this.reservationService.findAll(filter);
+    return this.reservationService.findAll(filter);
   }
 
   @ApiOperation({ summary: 'Get a reservation by ID' })
@@ -168,12 +168,12 @@ export class ReservationController {
   })
   @ApiResponse({ status: 400, description: 'Validation error' })
   @ApiResponse({ status: 404, description: 'Reservation not found' })
-  @Put(':id')
+  @Patch(':id')
   async update(
     @Body() data: UpdateReservationDto,
     @Param('id', ParseIntPipe) id: number,
   ) {
-    return this.reservationService.update(id, data);
+    return this.reservationService.updatePartial(id, data);
   }
 
   @ApiOperation({ summary: 'Delete a reservation by ID' })

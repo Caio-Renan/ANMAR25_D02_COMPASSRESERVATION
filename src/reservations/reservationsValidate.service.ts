@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotAcceptableException,
@@ -54,6 +55,12 @@ export class ReservationValidationService {
     startDate: Date,
     endDate: Date,
   ): Promise<boolean> {
+    if (endDate < startDate) {
+      throw new BadRequestException(
+        'End date cannot be earlier than start date',
+      );
+    }
+
     const conflictingReservations = await this.prisma.reservation.findFirst({
       where: {
         spaceId,
@@ -75,6 +82,10 @@ export class ReservationValidationService {
 
     if (!client) {
       throw new NotFoundException('Client not found');
+    }
+
+    if (client.status === 'INACTIVE') {
+      throw new BadRequestException('Client is inactive');
     }
   }
 

@@ -16,7 +16,10 @@ import { UpdateReservationDto } from './dto/update-reservation-dto';
 import ical from 'ical-generator';
 import { EmailService } from 'src/email/email.service';
 import { FilterReservationDto } from './dto/filter-reservation.dto';
-import { getPaginationParams, buildPaginatedResponse } from 'src/common/utils/pagination.util';
+import {
+  getPaginationParams,
+  buildPaginatedResponse,
+} from 'src/common/utils/pagination.util';
 @Injectable()
 export class ReservationService {
   constructor(
@@ -65,9 +68,9 @@ export class ReservationService {
   async findAll(filter: FilterReservationDto) {
     const page = parseInt(filter.page?.toString() || '1', 10);
     const limit = parseInt(filter.limit?.toString() || '10', 10);
-    
-    const { skip, take } = getPaginationParams({ page, limit});
-          
+
+    const { skip, take } = getPaginationParams({ page, limit });
+
     const where: Prisma.ReservationWhereInput = {};
 
     if (filter.status) {
@@ -83,13 +86,13 @@ export class ReservationService {
 
       if (filter.name) {
         where.client.name = {
-          contains: filter.name
+          contains: filter.name,
         };
       }
 
       if (filter.phone) {
         where.client.phone = {
-          contains: filter.phone
+          contains: filter.phone,
         };
       }
     }
@@ -97,7 +100,7 @@ export class ReservationService {
     if (filter.spaceName) {
       where.space = {
         name: {
-          contains: filter.spaceName
+          contains: filter.spaceName,
         },
       };
     }
@@ -116,15 +119,15 @@ export class ReservationService {
               phone: true,
               status: true,
               createdAt: true,
-              updatedAt: true
-            }
+              updatedAt: true,
+            },
           },
           space: {
             select: {
-              name: true
-            }
-          }
-        }
+              name: true,
+            },
+          },
+        },
       }),
       this.prisma.reservation.count({ where }),
     ]);
@@ -139,7 +142,7 @@ export class ReservationService {
     });
   }
 
-  async update(id: number, data: UpdateReservationDto) {
+  async updatePartial(id: number, data: UpdateReservationDto) {
     const reservation = await this.findOne(id);
 
     if (!reservation) {
@@ -182,12 +185,25 @@ export class ReservationService {
       }
     }
 
+    if (data.startDate || data.endDate) {
+      if (reservation.status === 'CLOSED') {
+        throw new BadRequestException(
+          'Date fields cannot be updated after booking is in cancelled status',
+        );
+      }
+
+      await this.validationService.isDateAvailable(
+        reservation.spaceId,
+        data.startDate || reservation.startDate,
+        data.endDate || reservation.endDate,
+      );
+    }
+
     const newData: Prisma.ReservationUpdateInput = {
+      status: data.status as ReservationStatus,
       startDate: data.startDate,
       endDate: data.endDate,
     };
-
-    newData.closedAt = new Date();
 
     return this.prisma.reservation.update({ where: { id }, data: newData });
   }
