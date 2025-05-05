@@ -1,8 +1,8 @@
 import { IsString, IsOptional, IsEnum, MaxLength, Matches } from 'class-validator';
 import { Status } from '@prisma/client';
-import { PaginationDTO } from '../../common/dto/pagination.dto'
+import { PaginationDto } from '../../common/dto/pagination.dto'
 
-export class FilterUserDTO extends PaginationDTO {
+export class FilterUserDTO extends PaginationDto {
   @IsString()
   @IsOptional()
   @MaxLength(100)
