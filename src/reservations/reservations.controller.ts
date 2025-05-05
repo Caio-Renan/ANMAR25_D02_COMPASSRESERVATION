@@ -24,6 +24,7 @@ import {
 } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { ReservationStatus } from '@prisma/client';
+import { FilterReservationDto } from './dto/filter-reservation.dto';
 
 @ApiTags('Reservations')
 @ApiBearerAuth()
@@ -108,18 +109,8 @@ export class ReservationController {
     },
   })
   @Get()
-  async findAll(
-    @Query('page') page = '1',
-    @Query('limit') limit = '10',
-    @Query('cpf') cpf?: string,
-    @Query('status') status?: ReservationStatus,
-  ) {
-    return this.reservationService.findAll({
-      page: parseInt(page),
-      limit: parseInt(limit),
-      cpf,
-      status,
-    });
+  async findAll(@Query() filter: FilterReservationDto) {
+      return this.reservationService.findAll(filter);
   }
 
   @ApiOperation({ summary: 'Get a reservation by ID' })
