@@ -41,8 +41,8 @@ export class ClientsController {
   @ApiResponse({ status: 400, description: 'Validation error' })
   @Roles(Role.ADMIN, Role.USER)
   @Post()
-  async create(@Body() dto: CreateClientDto) {
-    return this.clientsService.create(dto);
+  async create(@Body() dto: CreateClientDto, @CurrentUser() user: any) {
+    return this.clientsService.create(dto, user.id);
   }
 
   @ApiOperation({ summary: 'Update a client partially' })
