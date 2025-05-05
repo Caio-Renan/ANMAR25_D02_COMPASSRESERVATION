@@ -9,14 +9,19 @@ import { ClientsModule } from './clients/clients.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { validateEnv } from './common/config/env/validate-env';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot([{
+      ttl: 60,
+      limit: 10,
+    }]),
     AuthModule,
-    ReservationModule,
-    UsersModule,
-    SpacesModule,
-    ResourcesModule,
+    ReservationModule, 
+    UsersModule, 
+    SpacesModule, 
+    ResourcesModule, 
     ClientsModule,
     ConfigModule.forRoot({
       isGlobal: true,

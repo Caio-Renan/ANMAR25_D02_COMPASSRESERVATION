@@ -16,6 +16,10 @@ export type ValidatedEnv = {
   DEFAULT_USER_EMAIL: string;
   DEFAULT_USER_PASSWORD: string;
   DEFAULT_USER_PHONE: string;
+  DEFAULT_ADMIN_NAME: string;
+  DEFAULT_ADMIN_EMAIL: string;
+  DEFAULT_ADMIN_PASSWORD: string;
+  DEFAULT_ADMIN_PHONE: string;
   PORT: string;
   JWT_SECRET: string;
   JWT_EXPIRATION: string;
@@ -53,6 +57,22 @@ export function validateEnv(config: Record<string, unknown>): ValidatedEnv {
     phone: config.DEFAULT_USER_PHONE,
   });
 
+  const adminDTO = plainToInstance(CreateUserDTO, {
+    name: config.DEFAULT_ADMIN_NAME,
+    email: config.DEFAULT_ADMIN_EMAIL,
+    password: config.DEFAULT_ADMIN_PASSWORD,
+    phone: config.DEFAULT_ADMIN_PHONE,
+  });
+
+  const adminErrors = validateSync(adminDTO, { skipMissingProperties: false });
+
+  if (adminErrors.length > 0) {
+    const adminMessages = adminErrors
+      .flatMap(err => Object.values(err.constraints ?? {}))
+      .map(msg => `- ${msg}`);
+    errors.push('Default admin configuration errors:\n' + adminMessages.join('\n'));
+  }
+
   const userErrors = validateSync(userDTO, { skipMissingProperties: false });
 
   if (userErrors.length > 0) {
@@ -80,5 +100,9 @@ export function validateEnv(config: Record<string, unknown>): ValidatedEnv {
     DEFAULT_USER_EMAIL: userDTO.email,
     DEFAULT_USER_PASSWORD: userDTO.password,
     DEFAULT_USER_PHONE: userDTO.phone,
+    DEFAULT_ADMIN_NAME: adminDTO.name,
+    DEFAULT_ADMIN_EMAIL: adminDTO.email,
+    DEFAULT_ADMIN_PASSWORD: adminDTO.password,
+    DEFAULT_ADMIN_PHONE: adminDTO.phone,
   };
 }

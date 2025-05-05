@@ -1,13 +1,8 @@
-import { IsNotEmpty, IsString, IsOptional, IsInt, Min } from 'class-validator';
+import { PartialType } from "@nestjs/mapped-types";
+import { CreateResourceDto } from "./create-resource-dto";
 
-export class UpdateResourceDto {
-  @IsString()
-  @IsOptional()
-  @IsNotEmpty()
-  name: string;
 
-  @IsString()
-  @IsOptional()
-  @IsNotEmpty()
-  description: string;
+
+export class UpdateResourceDto extends PartialType(CreateResourceDto) {
+
 }

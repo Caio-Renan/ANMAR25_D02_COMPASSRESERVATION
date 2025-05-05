@@ -23,7 +23,7 @@ import { join } from 'path';
             },
           },
           defaults: {
-            from: '"nest-modules" <modules@nestjs.com>',
+            from: `"BookingAPI" <${process.env.MAIL_USER}>`,
           },
           template: {
             dir: join(__dirname, '..','common', 'templates'),
