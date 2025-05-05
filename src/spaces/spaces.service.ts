@@ -11,8 +11,8 @@ export class SpacesService {
   }
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(createSpaceDto: CreateSpaceDto): Promise<Space> {
-    const { name, description, capacity } = createSpaceDto;
+  async create(dto: CreateSpaceDto): Promise<Space> {
+    const { name, description, capacity } = dto;
 
     const existingSpace = await this.prisma.space.findUnique({
       where: { name },
@@ -44,10 +44,10 @@ export class SpacesService {
     });
   }
 
-  async update(id: number, updateSpaceDto: UpdateSpaceDto): Promise<Space> {
+  async update(id: number, dto: UpdateSpaceDto): Promise<Space> {
     return this.prisma.space.update({
       where: { id },
-      data: updateSpaceDto,
+      data: dto,
     });
   }
 
