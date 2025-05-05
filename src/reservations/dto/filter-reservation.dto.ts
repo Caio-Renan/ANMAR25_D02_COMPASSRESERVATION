@@ -1,8 +1,8 @@
-import { IsString, IsOptional, IsEnum, IsNotEmpty, MaxLength, Matches, Length, IsPhoneNumber } from 'class-validator';
+import { IsString, IsOptional, IsEnum, IsNotEmpty, MaxLength, Matches, IsPhoneNumber } from 'class-validator';
 import { ReservationStatus } from '@prisma/client';
 import { PaginationDto } from '../../common/dto/pagination.dto'
 import { Transform } from 'class-transformer';
-
+import { IsCpf } from 'src/common/decorators';
 export class FilterReservationDto extends PaginationDto {
   @IsString()
   @IsOptional()
@@ -57,4 +57,7 @@ export class FilterReservationDto extends PaginationDto {
   @IsNotEmpty()
   spaceName?: string;
 
+  @IsCpf()
+  @IsOptional()
+  cpf?: string;
 }
