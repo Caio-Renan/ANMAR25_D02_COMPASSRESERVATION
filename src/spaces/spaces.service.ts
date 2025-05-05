@@ -53,7 +53,7 @@ export class SpacesService {
     });
   }
 
-  async remove(id: number): Promise<void> {
+  async softDelete(id: number): Promise<void> {
     const existingSpace = await this.prisma.space.findUnique({
       where: { id },
     });

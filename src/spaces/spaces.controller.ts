@@ -90,7 +90,7 @@ export class SpacesController {
   @ApiResponse({ status: 200, description: 'Space deleted successfully' })
   @ApiResponse({ status: 404, description: 'Space not found' })
   @Delete(':id')
-  async remove(@Param('id') id: number) {
-    return this.spacesService.remove(id);
+  async delete(@Param('id') id: number) {
+    return this.spacesService.softDelete(id);
   }
 }
