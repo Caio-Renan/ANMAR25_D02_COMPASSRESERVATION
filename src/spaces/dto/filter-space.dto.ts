@@ -15,7 +15,7 @@ export class FilterSpaceDto extends PaginationDto {
 
     @IsOptional()
     @IsEnum(Status)
-    status?: string;
+    status?: Status;
 
 }
 
