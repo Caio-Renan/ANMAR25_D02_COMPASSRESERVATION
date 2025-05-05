@@ -62,7 +62,7 @@ export class SpacesController {
   @ApiResponse({ status: 200, description: 'Space found', schema: { example: { id: 1, name: 'Conference Room A', description: 'A large conference room with a projector', capacity: 50 } } })
   @ApiResponse({ status: 404, description: 'Space not found' })
   @Get(':id')
-  async findOne(@Param('id') id: string) {
+  async findOne(@Param('id') id: number) {
     const space = await this.spacesService.findOne(id);
 
     if (!space) {
@@ -94,7 +94,7 @@ export class SpacesController {
   @ApiResponse({ status: 200, description: 'Space updated successfully', schema: { example: { id: 1, name: 'Updated Conference Room A', description: 'Updated description', capacity: 60 } } })
   @ApiResponse({ status: 400, description: 'Validation error' })
   @Patch(':id')
-  update(@Param('id') id: string, @Body(new ValidationPipe()) updateSpaceDto: updateSpaceDto) {
+  update(@Param('id') id: number, @Body(new ValidationPipe()) updateSpaceDto: updateSpaceDto) {
     return this.spacesService.update(id, updateSpaceDto);
   }
 
@@ -103,7 +103,7 @@ export class SpacesController {
   @ApiResponse({ status: 200, description: 'Space deleted successfully' })
   @ApiResponse({ status: 404, description: 'Space not found' })
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id') id: number) {
     return this.spacesService.remove(id);
   }
 }
