@@ -37,30 +37,51 @@ export class SpacesService {
   }
 
   async findOne(id: number): Promise<Space | null> {
-    const space = await this.prisma.space.findUnique({
+    const existingSpace = await this.prisma.space.findUnique({
       where: { id },
     });
-    if (!space) {
+    
+    if (!existingSpace) {
       throw new NotFoundException('Space not found');
     }
-    return space
+    return existingSpace
   }
 
   async update(id: number, dto: UpdateSpaceDto): Promise<Space> {
-    return this.prisma.space.update({
-      where: { id },
-      data: dto,
-    });
-  }
-
-  async softDelete(id: number): Promise<void> {
     const existingSpace = await this.prisma.space.findUnique({
       where: { id },
     });
 
     if (!existingSpace) {
+      throw new NotFoundException('Space not found');
+    }
+
+    if (dto.name && dto.name !== existingSpace.name) {
+      const nameExists = await this.prisma.user.findUnique({
+        where: { email: dto.name },
+      });
+      if (nameExists) throw new ConflictException('Name already in use');
+    }
+
+    return this.prisma.space.update({
+      where: { id },
+      data: {
+        ...dto,
+        updatedAt: new Date(),
+      },
+    });
+  }
+
+  async softDelete(id: number): Promise<Space> {
+    const space = await this.prisma.space.findUnique({
+      where: { id },
+    });
+
+    if (!space) {
       throw new NotFoundException(`Space with id ${id} not found`);
     }
+
+    if(space.status === "INACTIVE") { throw new ConflictException("Space is already INACTIVE") };
 
     const bookings = await this.prisma.reservation.findMany({
       where: { spaceId: id },
@@ -70,8 +91,12 @@ export class SpacesService {
       throw new ConflictException('Cannot delete space with existing bookings');
     }
 
-    await this.prisma.space.delete({
+    return this.prisma.space.update({
       where: { id },
+      data: {
+        status: 'INACTIVE',
+        updatedAt: new Date(),
+      }
     });
   }
 }
