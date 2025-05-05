@@ -35,6 +35,7 @@ export class AuthService {
                          id: user.id,
                          name: user.name,
                          email: user.email,
+                         role: user.role,
                     },
                     {
                          expiresIn: '1 day',
@@ -132,7 +133,7 @@ export class AuthService {
 
           const newPassword = await bcrypt.hash(dto.password, 10);
 
-          await this.userService.update(userId, { password: newPassword });
+          await this.userService.update(userId, { password: newPassword }, user);
 
           return { message: 'Password successfully updated' };
 
