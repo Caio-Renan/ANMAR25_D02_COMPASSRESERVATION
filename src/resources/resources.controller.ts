@@ -17,6 +17,7 @@ import { ParamId } from 'src/common/decorators/param-id.decorator';
 import { ApiTags, ApiOperation, ApiBody, ApiResponse, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 
+
 @ApiTags('Resources')
 @ApiBearerAuth()
 @Controller('resources')
@@ -56,8 +57,9 @@ export class ResourcesController {
   })
   @ApiResponse({ status: 400, description: 'Validation error' })
   @Post()
-  async create(@Body() data: CreateResourceDto) {
-    return this.resourcesService.create(data);
+
+  async create(@Body() dto: CreateResourceDto) {
+    return this.resourcesService.createResource(dto);
   }
 
   @ApiOperation({ summary: 'Get all resources' })
@@ -131,8 +133,9 @@ export class ResourcesController {
   })
   @ApiResponse({ status: 400, description: 'Validation error' })
   @Patch(':id')
-  async updatePartial(@Body() data: UpdateResourceDto, @ParamId() id: number) {
-    return this.resourcesService.updatePartial(id, data);
+  async update(@Body() dto: CreateResourceDto, @Param('id') id: number) {
+    return this.resourcesService.update(id, dto);
+
   }
 
   @ApiOperation({ summary: 'Delete a resource by ID' })
