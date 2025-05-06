@@ -51,19 +51,10 @@ export class AuthValidateService {
     return user;
   }
   
-  async validateClientIdFromToken(clientId: string) {
-    if (!clientId) {
+  ensureValidClientId(clientId: unknown) {
+    if (!clientId || typeof clientId !== 'number') {
       throw new BadRequestException('Invalid Token');
     }
-  
-    const parsedId = Number(clientId);
-  
-    if (isNaN(parsedId)) {
-      throw new BadRequestException('Client ID must be a number');
-    }
-  
-    return parsedId;
   }
-  
   
 }
