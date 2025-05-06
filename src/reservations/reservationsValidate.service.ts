@@ -24,9 +24,7 @@ export class ReservationValidationService {
   async isResourceActiveAndEnough(
     resources: CreateReservationResourceDto[],
   ): Promise<boolean> {
-
     for (const { resourceId, quantity } of resources) {
-
       const resource = await this.prisma.resource.findUnique({
         where: { id: resourceId },
       });
@@ -92,8 +90,22 @@ export class ReservationValidationService {
 
   async updateQuantity(resources: CreateReservationResourceDto[]) {
     await Promise.all(
-      resources.map(({ resourceId, quantity }) => {
-        this.prisma.resource.update({
+      resources.map(async ({ resourceId, quantity }) => {
+        const resource = await this.prisma.resource.findUnique({
+          where: { id: resourceId },
+        });
+
+        if (!resource) {
+          throw new Error(`Resource with ID ${resourceId} not found.`);
+        }
+
+        if (resource.quantity < quantity) {
+          throw new Error(
+            `Requested quantity (${quantity}) exceeds available quantity (${resource.quantity}) for resource ${resourceId}.`,
+          );
+        }
+
+        return this.prisma.resource.update({
           where: { id: resourceId },
           data: { quantity: { decrement: quantity } },
         });
