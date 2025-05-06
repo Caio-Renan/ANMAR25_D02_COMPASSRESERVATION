@@ -14,8 +14,8 @@ import { join } from 'path';
         }
         return {
           transport: {
-            host: 'smtp.gmail.com',
-            port: 587,
+            host: process.env.MAIL_HOST,
+            port: Number(process.env.MAIL_PORT),
             secure: false,
             auth: {
               user: process.env.MAIL_USER,
