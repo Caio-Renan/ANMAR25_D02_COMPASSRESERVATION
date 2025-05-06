@@ -74,13 +74,7 @@ export class SpacesService {
 
     await this.validationService.ensureSpaceIsActive(space);
 
-    const bookings = await this.prisma.reservation.findMany({
-      where: { spaceId: id },
-    });
-
-    if (bookings.length > 0) {
-      throw new ConflictException('Cannot delete space with existing bookings');
-    }
+    await this.validationService.validateNoBookings(this.prisma, id);
 
     return this.prisma.space.update({
       where: { id },
