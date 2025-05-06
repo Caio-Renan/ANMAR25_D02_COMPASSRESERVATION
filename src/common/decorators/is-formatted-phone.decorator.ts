@@ -41,7 +41,7 @@ export function IsFormattedPhoneNumber() {
     }),
     IsPhoneNumber('BR', {
       message:
-        'phone must be a valid phone number (e.g., (xx) xxxx-xxxx, +55 (xx) xxxx-xxxx).',
+        'Phone must be a valid phone number (e.g., (xx) xxxx-xxxx, +55 (xx) xxxx-xxxx).',
     }),
   );
 }

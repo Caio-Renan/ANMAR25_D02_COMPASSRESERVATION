@@ -15,7 +15,7 @@ export function IsPersonName() {
     }),
     Matches(/^[A-Za-zÀ-ÿ\s.'-]+$/, {
       message:
-        'name must contain only letters, spaces, dots, apostrophes, or hyphens.',
+        'Name must contain only letters, spaces, dots, apostrophes, or hyphens.',
     }),
   );
 }

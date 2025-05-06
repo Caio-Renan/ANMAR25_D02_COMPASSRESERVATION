@@ -32,9 +32,9 @@ async function main() {
       },
     });
 
-    logger.info('default user created');
+    logger.info('Default user created');
   } else {
-    logger.info('default user already exists.');
+    logger.info('Default user already exists.');
   }
 
     const existingAdmin = await prisma.user.findFirst({
@@ -57,9 +57,9 @@ async function main() {
         },
       });
   
-      logger.info('admin created');
+      logger.info('Admin created');
     } else {
-      logger.info('admin already exists.');
+      logger.info('Admin already exists.');
     }
 }
 
