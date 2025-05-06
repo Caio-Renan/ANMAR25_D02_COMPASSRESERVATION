@@ -57,10 +57,10 @@ DEFAULT_USER_PASSWORD=Us3r@1234
 DEFAULT_USER_PHONE=+55 (81) 99999-9999
 NODE_ENV=development
 
-MAIL_HOST=smtp.ethereal.email
+MAIL_HOST=smtp.ethereal.email <-- If you are going to use Gmail, put smtp.gmail.email 
 MAIL_PORT=587
 MAIL_SECURE=false
-MAIL_USER=seuemail@gmail.com
+MAIL_USER=seuemail@ethereal.com <-- If you are going to use Gmail, put smtp.gmail.email 
 MAIL_PASS=suaSenha
 
 JWT_SECRET=mysecretkey
