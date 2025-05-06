@@ -32,6 +32,10 @@ export class ClientValidationService {
         const client = await this.prisma.client.findUnique({ where: { id }, select });
     
         if (!client) throw new NotFoundException('Client not found');
+
+        if (client.status !== 'ACTIVE') {
+          throw new BadRequestException('Client inactive');
+        }
     
         return client;
       }
@@ -40,6 +44,15 @@ export class ClientValidationService {
         if (client.status === 'INACTIVE') {
           throw new BadRequestException('Client is already inactive');
         }
+      }
+
+      async verifiedEmail(id: number){
+       const client = await this.getClientOrFail(id)
+       const email = client.isEmailVerified;
+       if(email){
+        throw new BadRequestException('Email is already verified')
+       }
+
       }
       
 }
