@@ -63,7 +63,13 @@ export class ResourcesSevice {
 
     await this.validationService.validateResourceFields(dto);
 
-    return this.prisma.resource.update({ where: { id }, data: dto });
+    return this.prisma.resource.update({
+      where: { id },
+      data: {
+        ...dto,
+        updatedAt: new Date(),
+      },
+    });
   }
 
   async softDelete(id: number) {
