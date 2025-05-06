@@ -1,6 +1,6 @@
 import { Transform } from "class-transformer";
 import { IsJWT, IsNotEmpty, IsStrongPassword, Length, Matches } from "class-validator";
-import { CreateUserDTO } from "src/users/dto/create-user.dto";
+import { CreateUserDto } from "src/users/dto/create-user.dto";
 
 
 
