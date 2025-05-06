@@ -21,12 +21,13 @@ import { Role } from 'src/common/enum/roles.enum';
 import { CurrentUser, Roles } from 'src/common/decorators';
 import { FilterResourcesDto } from './dto/filter-resources.dto';
 import { IdParamDto } from 'src/common/dto/id-param.dto';
+import { ThrottlerGuard } from '@nestjs/throttler';
 
 
 @ApiTags('Resources')
 @ApiBearerAuth()
 @Controller('resources')
-@UseGuards(AuthGuard('jwt'), RolesGuard)
+@UseGuards(ThrottlerGuard, AuthGuard('jwt'), RolesGuard)
 export class ResourcesController {
   constructor(private readonly resourcesService: ResourcesSevice) { }
 

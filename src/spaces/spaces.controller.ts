@@ -9,10 +9,11 @@ import { CurrentUser, Roles } from "src/common/decorators";
 import { RolesGuard } from "src/common/guards/roles.guard";
 import { IdParamDto } from "src/common/dto/id-param.dto";
 import { FilterSpaceDto } from "./dto/filter-space.dto";
+import { ThrottlerGuard } from "@nestjs/throttler";
 @ApiTags('Spaces')
 @ApiBearerAuth()
 @Controller('spaces')
-@UseGuards(AuthGuard('jwt'), RolesGuard)
+@UseGuards(ThrottlerGuard, AuthGuard('jwt'), RolesGuard)
 export class SpacesController {
   constructor(private readonly spacesService: SpacesService) { }
 
