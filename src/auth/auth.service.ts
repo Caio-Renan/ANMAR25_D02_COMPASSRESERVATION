@@ -125,9 +125,7 @@ export class AuthService {
 
           const clientId = payload.id;
 
-          if(!clientId) {
-               throw new BadRequestException('Invalid Token');
-          }
+          this.validationService.ensureValidClientId(clientId);
 
           await this.prisma.client.update({
                where: { id: clientId },
