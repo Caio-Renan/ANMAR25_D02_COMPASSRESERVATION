@@ -9,6 +9,7 @@ import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Role } from 'src/common/enum/roles.enum';
 import { CurrentUser, Roles } from 'src/common/decorators';
 import { IdParamDto } from 'src/common/dto/id-param.dto';
+import { AuthenticatedUser } from 'src/auth/types/authenticated-user';
 @ApiTags('Clients')
 @ApiBearerAuth()
 @Controller('clients')
@@ -40,7 +41,7 @@ export class ClientsController {
   @ApiResponse({ status: 400, description: 'Validation error' })
   @Roles(Role.ADMIN, Role.USER)
   @Post()
-  async create(@Body() dto: CreateClientDto, @CurrentUser() user: any) {
+  async create(@Body() dto: CreateClientDto, @CurrentUser() user: AuthenticatedUser) {
     return this.clientsService.create(dto, user.id);
   }
 
@@ -66,7 +67,7 @@ export class ClientsController {
   @ApiResponse({ status: 400, description: 'Validation error' })
   @Roles(Role.ADMIN, Role.USER)
   @Patch(':id')
-  async updatePartial(@Param() params: IdParamDto, @Body() dto: UpdateClientDto, @CurrentUser() user: any) {
+  async updatePartial(@Param() params: IdParamDto, @Body() dto: UpdateClientDto, @CurrentUser() user: AuthenticatedUser) {
 
     if(user.role === Role.USER){
       const client = await this.clientsService.findById(params.id);
@@ -94,7 +95,7 @@ export class ClientsController {
   @ApiResponse({ status: 404, description: 'Client not found' })
   @Roles(Role.ADMIN, Role.USER)
   @Get(':id')
-  async findOne(@Param() params: IdParamDto, @CurrentUser() user: any) {
+  async findOne(@Param() params: IdParamDto, @CurrentUser() user: AuthenticatedUser) {
       const client = await this.clientsService.findById(params.id);
 
       if(user.role === Role.USER && client.userId !== user.id){

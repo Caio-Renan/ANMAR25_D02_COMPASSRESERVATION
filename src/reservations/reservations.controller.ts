@@ -30,6 +30,7 @@ import { CurrentUser, Roles } from 'src/common/decorators';
 import { Role } from 'src/common/enum/roles.enum';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { IdParamDto } from 'src/common/dto/id-param.dto';
+import { AuthenticatedUser } from 'src/auth/types/authenticated-user';
 @ApiTags('Reservations')
 @ApiBearerAuth()
 @Controller('reservations')
@@ -137,7 +138,7 @@ export class ReservationController {
   @ApiResponse({ status: 404, description: 'Reservation not found' })
   @Roles(Role.ADMIN, Role.USER)
   @Get(':id')
-  async findOne(@Param() params: IdParamDto, @CurrentUser() user: any) {
+  async findOne(@Param() params: IdParamDto, @CurrentUser() user: AuthenticatedUser) {
       const reservation = await this.reservationService.findOne(params.id);
 
       if(user.role === Role.USER && reservation?.clientId !== user.id){
@@ -187,7 +188,7 @@ export class ReservationController {
   async update(
     @Body() data: UpdateReservationDto,
     @Param() params: IdParamDto,
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
   ) {
 
     if(user.role === Role.USER) {

@@ -11,6 +11,7 @@ import { Request } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { CurrentUser } from 'src/common/decorators';
 import { IdParamDto } from 'src/common/dto/id-param.dto';
+import { AuthenticatedUser } from 'src/auth/types/authenticated-user';
 @ApiTags('Users')
 @ApiBearerAuth()
 @Controller('users')
@@ -72,7 +73,7 @@ export class UsersController {
     @Body() dto: UpdateUserDto,
     @Req() req: Request
   ) {
-    const user = req.user as any;  
+    const user = req.user as AuthenticatedUser;  
     return this.usersService.update(params.id, dto, user); 
   }
 
@@ -92,7 +93,7 @@ export class UsersController {
   @ApiResponse({ status: 404, description: 'User not found' })
   @Roles(Role.ADMIN, Role.USER)
   @Get(':id')
-  async findOne(@Param() params: IdParamDto, @CurrentUser() user: any) {
+  async findOne(@Param() params: IdParamDto, @CurrentUser() user: AuthenticatedUser) {
     if( user.role === Role.USER && user.id !== params.id){
       throw new ForbiddenException('Users can only access their own data.')
     }
@@ -105,7 +106,7 @@ export class UsersController {
   @ApiResponse({ status: 404, description: 'User not found' })
   @Roles(Role.ADMIN, Role.USER)
   @Delete(':id')
-  async softDelete(@Param() params: IdParamDto, @CurrentUser() user: any) {
+  async softDelete(@Param() params: IdParamDto, @CurrentUser() user: AuthenticatedUser) {
     if (user.role === Role.USER && user.id !== params.id){
       throw new ForbiddenException('Users can only delete their own data.')
     }
