@@ -214,7 +214,7 @@ After a new user registers or after running `Npm run seed`, users can obtain an 
     * **Administrator (Seed):** Use the `DEFAULT_ADMIN_EMAIL` and `DEFAULT_ADMIN_PASSWORD` defined in the `.env`.
     * **Registered User:** Use the email and password provided during the registration process.
       
-![image](https://github.com/user-attachments/assets/fcc85300-52bd-460a-a9b7-310cc8d3676a)
+![image](https://github.com/user-attachments/assets/81045a05-98ed-4563-8884-ee6c64833bde)
 > (Image example for Admin user)
 
 
