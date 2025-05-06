@@ -22,7 +22,7 @@ export class ClientValidationService {
         }
       }
     
-      async findUserOrThrow(id: number, select?: Prisma.UserSelect): Promise<User> {
+      async getUserOrFail(id: number, select?: Prisma.UserSelect): Promise<User> {
         const user = await this.prisma.user.findUnique({
           where: { id }, select: select
         });
