@@ -1,9 +1,10 @@
 import { applyDecorators } from '@nestjs/common';
-import { IsInt, IsNotEmpty, Max, ValidationArguments } from 'class-validator';
+import { IsInt, IsNotEmpty, Max, ValidationArguments, Min } from 'class-validator';
 import { Type } from 'class-transformer';
   
   export function IsValidInt() {
     return applyDecorators(
+      Min(1),
       Type(() => Number),
       IsNotEmpty({
         message: ({ property }: ValidationArguments) =>
