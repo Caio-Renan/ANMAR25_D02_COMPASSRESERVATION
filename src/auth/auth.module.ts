@@ -7,7 +7,7 @@ import { UsersModule } from "src/users/users.module";
 import { EmailModule } from "src/email/email.module";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { JwtStrategy } from './jwt.strategy';
-
+import { AuthValidateService } from "./authValidate.service";
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }), 
@@ -23,8 +23,8 @@ import { JwtStrategy } from './jwt.strategy';
     forwardRef(() => UsersModule),
     EmailModule,
   ],
-  providers: [AuthService, JwtStrategy,],
-  exports: [AuthService, JwtModule],
+  providers: [AuthService, JwtStrategy, AuthValidateService, ],
+  exports: [AuthService, JwtModule, AuthValidateService],
   controllers: [AuthController],
 })
 export class AuthModule {}
