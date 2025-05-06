@@ -10,20 +10,19 @@ import { UpdateResourceDto } from './dto/update-resource.dto';
 import { getPaginationParams, buildPaginatedResponse } from 'src/common/utils/pagination.util';
 import { FilterResourcesDto } from './dto/filter-resources.dto'
 import { Prisma } from '@prisma/client';
+import { ResourceValidationService } from './resourcesValidate.service';
 @Injectable()
 export class ResourcesSevice {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly validationService: ResourceValidationService,
+  ) {}
 
-  async create(data: CreateResourceDto) {
-    const resource = await this.prisma.resource.findUnique({
-      where: { name: data.name },
-    });
 
-    if (resource) {
-      throw new ConflictException('Resource already exists');
-    }
+  async create(dto: CreateResourceDto) {
+    await this.validationService.validateResourceFields(dto);
 
-    return this.prisma.resource.create({ data });
+    return this.prisma.resource.create({ data: dto });
   }
 
   async findAll(filter: FilterResourcesDto) {
@@ -55,32 +54,28 @@ export class ResourcesSevice {
   }
 
   async findOne(id: number) {
-    await this.exists(id);
+    await this.validationService.getResourceOrFail(id);
     return this.prisma.resource.findUnique({ where: { id } });
   }
 
-  async updatePartial(id: number, data: UpdateResourceDto) {
-    await this.exists(id);
+  async update(id: number, dto: UpdateResourceDto) {
+    await this.validationService.getResourceOrFail(id);
 
-    let resource;
-    if (data.name) {
-      resource = await this.prisma.resource.findUnique({
-        where: { name: data.name },
-      });
-    }
+    await this.validationService.validateResourceFields(dto);
 
-    if (resource) {
-      throw new ConflictException('Resource already exists');
-    }
-
-    return this.prisma.resource.update({ where: { id }, data });
+    return this.prisma.resource.update({
+      where: { id },
+      data: {
+        ...dto,
+        updatedAt: new Date(),
+      },
+    });
   }
 
   async softDelete(id: number) {
-    const resource = await this.prisma.resource.findUnique({ where: { id } });
-    if (resource?.status === 'INACTIVE') {
-      throw new BadRequestException('Resource is already inactive');
-    }
+    const resource = await this.validationService.getResourceOrFail(id);
+
+    await this.validationService.ensureResourceIsActive(resource);
 
     return this.prisma.resource.update({
       where: { id },
@@ -89,11 +84,5 @@ export class ResourcesSevice {
         updatedAt: new Date(),
       },
     });
-  }
-
-  async exists(id: number) {
-    if (!(await this.prisma.resource.count({ where: { id } }))) {
-      throw new NotFoundException('resource not found');
-    }
   }
 }

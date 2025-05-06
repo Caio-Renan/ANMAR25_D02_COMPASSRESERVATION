@@ -6,6 +6,7 @@ import * as bcrypt from 'bcrypt';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Prisma, User } from '@prisma/client';
 import { getPaginationParams, buildPaginatedResponse } from '../common/utils/pagination.util'
+import { UserValidationService } from './usersValidate.service';
 
 const userSelectWithoutPassword: Prisma.UserSelect = {
   id: true,
@@ -20,20 +21,13 @@ const userSelectWithoutPassword: Prisma.UserSelect = {
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly validationService: UserValidationService,
+  ) {}
 
   async create(dto: CreateUserDto) {
-    const existingEmail = await this.prisma.user.findUnique({
-      where: { email: dto.email },
-    });
-
-    if (existingEmail) throw new ConflictException('email already registered');
-
-    const existingPhone = await this.prisma.user.findUnique({
-        where: { phone: dto.phone },
-    });
-    
-    if (existingPhone) throw new ConflictException('phone already registered');
+    await this.validationService.validateUserFields(dto);
     
     const hash = await bcrypt.hash(dto.password, 10);
 
@@ -51,22 +45,9 @@ export class UsersService {
       throw new ForbiddenException('You do not have permission to update this user');
     }
   
-    await this.isIdValueCorrect(id);
-    const existingUser = await this.checkIfUserExists(id);
+    const existingUser = await this.validationService.getUserOrFail(id);
   
-    if (dto.email && dto.email !== existingUser.email) {
-      const emailExists = await this.prisma.user.findUnique({
-        where: { email: dto.email },
-      });
-      if (emailExists) throw new ConflictException('Email already in use');
-    }
-  
-    if (dto.phone && dto.phone !== existingUser.phone) {
-      const phoneExists = await this.prisma.user.findUnique({
-        where: { phone: dto.phone },
-      });
-      if (phoneExists) throw new ConflictException('Phone number already in use');
-    }
+    await this.validationService.validateUserFields(dto);
   
     let password = existingUser.password;
     if (dto.password) {
@@ -117,19 +98,14 @@ export class UsersService {
   }
 
   async findOne(id: number) {
-    await this.isIdValueCorrect(id);
-
-    const user = await this.checkIfUserExists(id, userSelectWithoutPassword);
+    const user = await this.validationService.getUserOrFail(id, userSelectWithoutPassword);
     return user;
   }
 
   async softDelete(id: number) {
+    const user = await this.validationService.getUserOrFail(id);
 
-    await this.isIdValueCorrect(id);
-
-    const user = await this.checkIfUserExists(id);
-
-    if(user.status === "INACTIVE") { throw new ConflictException("user is already INACTIVE") };
+    await this.validationService.ensureUserIsActive(user);
 
     return this.prisma.user.update({
       where: { id },
@@ -139,24 +115,4 @@ export class UsersService {
       }, select: userSelectWithoutPassword
     });
   }
-
-  async isIdValueCorrect(id: number) {
-    if (Number.isNaN(id)) {
-      throw new BadRequestException('id must be a number');
-    }
-
-    if (id < 1) { throw new BadRequestException('id must be greater than or equal to 1');}
-  }
-
-  async checkIfUserExists(id: number, select?: Prisma.UserSelect): Promise<User> {
-    const user = await this.prisma.user.findUnique({
-      where: { id }, select: select
-    });
-  
-    if (!user) {
-      throw new NotFoundException('user not found');
-    }
-
-    return user;
-  } 
 }

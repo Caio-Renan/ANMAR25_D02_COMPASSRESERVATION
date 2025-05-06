@@ -10,6 +10,7 @@ import { User } from "@prisma/client";
 import { EmailService } from "src/email/email.service";
 import { AuthResetDto } from "./dto/auth-reset.dto";
 import { AuthVerifyEmailDto } from "./dto/auth-verify-email.dto";
+import { AuthValidateService } from "./authValidate.service";
 
 
 
@@ -26,7 +27,8 @@ export class AuthService {
           private readonly jwtService: JwtService,
           private readonly userService: UsersService,
           private readonly emailService: EmailService,
-     ) { }
+          private readonly validationService: AuthValidateService
+     ) {}
 
      private createToken(user: User) {
           return {
@@ -60,25 +62,11 @@ export class AuthService {
      }
 
      async login(dto: AuthLoginDto) {
-          const user = await this.prisma.user.findFirst({
-               where: {
-                    email: dto.email,
-               },
-          });
+          const user = await this.validationService.validateUserExistsByEmail(dto.email);
 
-          if (!user) {
-               throw new NotFoundException('Email not found');
-          }
+          await this.validationService.validateUserStatus(user);
 
-          if (user.status === 'INACTIVE') {
-               throw new ForbiddenException('User is inactive');
-          }
-
-          const isValidPassword = await bcrypt.compare(dto.password, user.password);
-
-          if (!isValidPassword) {
-               throw new UnauthorizedException('Invalid password');
-          }
+          await this.validationService.validatePassword(dto, user);
 
           return this.createToken(user);
      }
@@ -91,9 +79,7 @@ export class AuthService {
      }
 
      async forget(dto: AuthForgetDto) {
-          const user = await this.prisma.user.findFirst({
-               where: { email: dto.email },
-          });
+          const user = await this.validationService.validateUserExistsForRecovery(dto.email);
 
           if (!user) {
                return { message: 'If the email exists, a recovery link has been sent' };
@@ -121,15 +107,7 @@ export class AuthService {
 
           const userId = payload.id;
 
-          if (!userId) {
-               throw new BadRequestException('Token payload does not contain a valid user ID')
-          }
-
-          const user = await this.userService.findOne(userId);
-
-          if (!user) {
-               throw new NotFoundException('No user found for the provided token')
-          }
+          const user = await this.validationService.validateUserFromToken(userId);
 
           const newPassword = await bcrypt.hash(dto.password, 10);
 
@@ -147,9 +125,7 @@ export class AuthService {
 
           const clientId = payload.id;
 
-          if(!clientId) {
-               throw new BadRequestException('Invalid Token');
-          }
+          this.validationService.ensureValidClientId(clientId);
 
           await this.prisma.client.update({
                where: { id: clientId },

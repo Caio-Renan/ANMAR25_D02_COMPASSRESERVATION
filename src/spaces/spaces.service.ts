@@ -5,29 +5,20 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { Prisma, Space, Status } from '@prisma/client';
 import { FilterSpaceDto } from './dto/filter-space.dto';
 import { getPaginationParams, buildPaginatedResponse } from 'src/common/utils/pagination.util';
+import { SpaceValidationService } from './spacesValidate.service';
 @Injectable()
 export class SpacesService {
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly validationService: SpaceValidationService
+  ) {}
 
   async create(dto: CreateSpaceDto): Promise<Space> {
-    const { name, description, capacity } = dto;
 
-    const existingSpace = await this.prisma.space.findUnique({
-      where: { name },
-    });
+    await this.validationService.validateSpaceFields(dto);
 
-    if (existingSpace) {
-      throw new ConflictException('Space with this name already exists');
-    }
-
-    return this.prisma.space.create({
-      data: {
-        name,
-        description,
-        capacity,
-      },
-    });
+    return this.prisma.space.create({ data: dto });
   }
 
   async findAll(filter: FilterSpaceDto) {
@@ -60,31 +51,14 @@ export class SpacesService {
   
 
   async findOne(id: number): Promise<Space | null> {
-    const existingSpace = await this.prisma.space.findUnique({
-      where: { id },
-    });
-    
-    if (!existingSpace) {
-      throw new NotFoundException('Space not found');
-    }
-    return existingSpace
+    await this.validationService.getSpaceOrFail(id)
+    return this.prisma.space.findUnique({ where: { id } });
   }
 
   async update(id: number, dto: UpdateSpaceDto): Promise<Space> {
-    const existingSpace = await this.prisma.space.findUnique({
-      where: { id },
-    });
+    await this.validationService.getSpaceOrFail(id);
 
-    if (!existingSpace) {
-      throw new NotFoundException('Space not found');
-    }
-
-    if (dto.name && dto.name !== existingSpace.name) {
-      const nameExists = await this.prisma.user.findUnique({
-        where: { email: dto.name },
-      });
-      if (nameExists) throw new ConflictException('Name already in use');
-    }
+    await this.validationService.validateSpaceFields(dto);
 
     return this.prisma.space.update({
       where: { id },
@@ -96,23 +70,11 @@ export class SpacesService {
   }
 
   async softDelete(id: number): Promise<Space> {
-    const space = await this.prisma.space.findUnique({
-      where: { id },
-    });
+    const space = await this.validationService.getSpaceOrFail(id);
 
-    if (!space) {
-      throw new NotFoundException(`Space with id ${id} not found`);
-    }
+    await this.validationService.ensureSpaceIsActive(space);
 
-    if(space.status === "INACTIVE") { throw new ConflictException("Space is already INACTIVE") };
-
-    const bookings = await this.prisma.reservation.findMany({
-      where: { spaceId: id },
-    });
-
-    if (bookings.length > 0) {
-      throw new ConflictException('Cannot delete space with existing bookings');
-    }
+    await this.validationService.validateNoBookings(this.prisma, id);
 
     return this.prisma.space.update({
       where: { id },

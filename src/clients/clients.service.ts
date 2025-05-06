@@ -1,7 +1,5 @@
 import {
   Injectable,
-  NotFoundException,
-  BadRequestException,
   ConflictException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -12,6 +10,7 @@ import { FilterClientDto } from './dto/filter-client.dto';
 import { getPaginationParams, buildPaginatedResponse } from '../common/utils/pagination.util';
 import { JwtService } from '@nestjs/jwt';
 import { EmailService } from 'src/email/email.service';
+import { ClientValidationService } from './clientsValidate.service';
 
 const clientSelect: Prisma.ClientSelect = {
   id: true,
@@ -30,18 +29,12 @@ export class ClientsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
-    private readonly emailService: EmailService,
+    private readonly validationService: ClientValidationService,
+    private readonly emailService: EmailService, 
   ) { }
 
   async create(dto: CreateClientDto, userId: number): Promise<Client> {
-    const existingCpf = await this.prisma.client.findUnique({ where: { cpf: dto.cpf } });
-    if (existingCpf) throw new ConflictException('CPF already registered');
-
-    const existingEmail = await this.prisma.client.findUnique({ where: { email: dto.email } });
-    if (existingEmail) throw new ConflictException('Email already registered');
-
-    const existingPhone = await this.prisma.client.findUnique({ where: { phone: dto.phone } });
-    if (existingPhone) throw new ConflictException('Phone already registered');
+    await this.validationService.validateClientFields(dto);
 
     const client = await this.prisma.client.create({
       data: {
@@ -71,23 +64,8 @@ export class ClientsService {
   }
 
   async update(id: number, dto: UpdateClientDto): Promise<Client> {
-    await this.isIdValueCorrect(id);
-    const client = await this.checkIfClientExists(id);
 
-    if (dto.email && dto.email !== client.email) {
-      const emailExists = await this.prisma.client.findUnique({ where: { email: dto.email } });
-      if (emailExists) throw new ConflictException('Email already registered');
-    }
-
-    if (dto.phone && dto.phone !== client.phone) {
-      const phoneExists = await this.prisma.client.findUnique({ where: { phone: dto.phone } });
-      if (phoneExists) throw new ConflictException('Phone already registered');
-    }
-
-    if (dto.cpf && dto.cpf !== client.cpf) {
-      const cpfExists = await this.prisma.client.findUnique({ where: { cpf: dto.cpf } });
-      if (cpfExists) throw new ConflictException('CPF already registered');
-    }
+    await this.validationService.validateClientFields(dto);
 
     return this.prisma.client.update({
       where: { id },
@@ -125,17 +103,13 @@ export class ClientsService {
   }
 
   async findById(id: number) {
-    await this.isIdValueCorrect(id);
-    return this.checkIfClientExists(id, clientSelect);
+    return this.validationService.getClientOrFail(id, clientSelect);
   }
 
   async softDelete(id: number) {
-    await this.isIdValueCorrect(id);
-    const client = await this.checkIfClientExists(id);
+    const client = await this.validationService.getClientOrFail(id);
 
-    if (client.status === 'INACTIVE') {
-      throw new ConflictException('Client already INACTIVE');
-    }
+    await this.validationService.ensureClientIsActive(client);
 
     return this.prisma.client.update({
       where: { id },
@@ -145,18 +119,5 @@ export class ClientsService {
       },
       select: clientSelect,
     });
-  }
-
-  async isIdValueCorrect(id: number) {
-    if (Number.isNaN(id)) throw new BadRequestException('ID must be a number');
-    if (id < 1) throw new BadRequestException('ID must be at least 1');
-  }
-
-  async checkIfClientExists(id: number, select?: Prisma.ClientSelect): Promise<Client> {
-    const client = await this.prisma.client.findUnique({ where: { id }, select });
-
-    if (!client) throw new NotFoundException('Client not found');
-
-    return client;
   }
 }
