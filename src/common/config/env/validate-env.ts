@@ -1,6 +1,6 @@
 import { plainToInstance } from 'class-transformer';
 import { validateSync } from 'class-validator';
-import { EnvironmentDTO } from './env.dto';
+import { EnvironmentDto } from './env.dto';
 import { requiredEnvVars } from './required-env-vars';
 import { Environment } from './env.enum';
 import { CreateUserDto } from '../../../users/dto/create-user.dto';
@@ -37,7 +37,7 @@ export function validateEnv(config: Record<string, unknown>): ValidatedEnv {
     );
   }
 
-  const envConfig = plainToInstance(EnvironmentDTO, config, {
+  const envConfig = plainToInstance(EnvironmentDto, config, {
     enableImplicitConversion: true,
   });
 
@@ -50,21 +50,21 @@ export function validateEnv(config: Record<string, unknown>): ValidatedEnv {
     errors.push('Environment variable errors:\n' + envMessages.join('\n'));
   }
 
-  const userDTO = plainToInstance(CreateUserDto, {
+  const userDto = plainToInstance(CreateUserDto, {
     name: config.DEFAULT_USER_NAME,
     email: config.DEFAULT_USER_EMAIL,
     password: config.DEFAULT_USER_PASSWORD,
     phone: config.DEFAULT_USER_PHONE,
   });
 
-  const adminDTO = plainToInstance(CreateUserDto, {
+  const adminDto = plainToInstance(CreateUserDto, {
     name: config.DEFAULT_ADMIN_NAME,
     email: config.DEFAULT_ADMIN_EMAIL,
     password: config.DEFAULT_ADMIN_PASSWORD,
     phone: config.DEFAULT_ADMIN_PHONE,
   });
 
-  const adminErrors = validateSync(adminDTO, { skipMissingProperties: false });
+  const adminErrors = validateSync(adminDto, { skipMissingProperties: false });
 
   if (adminErrors.length > 0) {
     const adminMessages = adminErrors
@@ -73,7 +73,7 @@ export function validateEnv(config: Record<string, unknown>): ValidatedEnv {
     errors.push('Default admin configuration errors:\n' + adminMessages.join('\n'));
   }
 
-  const userErrors = validateSync(userDTO, { skipMissingProperties: false });
+  const userErrors = validateSync(userDto, { skipMissingProperties: false });
 
   if (userErrors.length > 0) {
     const userMessages = userErrors
@@ -96,13 +96,13 @@ export function validateEnv(config: Record<string, unknown>): ValidatedEnv {
     PORT: envConfig.PORT,
     JWT_SECRET: envConfig.JWT_SECRET,
     JWT_EXPIRATION: envConfig.JWT_EXPIRATION,
-    DEFAULT_USER_NAME: userDTO.name,
-    DEFAULT_USER_EMAIL: userDTO.email,
-    DEFAULT_USER_PASSWORD: userDTO.password,
-    DEFAULT_USER_PHONE: userDTO.phone,
-    DEFAULT_ADMIN_NAME: adminDTO.name,
-    DEFAULT_ADMIN_EMAIL: adminDTO.email,
-    DEFAULT_ADMIN_PASSWORD: adminDTO.password,
-    DEFAULT_ADMIN_PHONE: adminDTO.phone,
+    DEFAULT_USER_NAME: userDto.name,
+    DEFAULT_USER_EMAIL: userDto.email,
+    DEFAULT_USER_PASSWORD: userDto.password,
+    DEFAULT_USER_PHONE: userDto.phone,
+    DEFAULT_ADMIN_NAME: adminDto.name,
+    DEFAULT_ADMIN_EMAIL: adminDto.email,
+    DEFAULT_ADMIN_PASSWORD: adminDto.password,
+    DEFAULT_ADMIN_PHONE: adminDto.phone,
   };
 }
