@@ -3,7 +3,7 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { AuthGuard } from './common/guards/auth.guard';
 import { JwtService } from '@nestjs/jwt';
-import { LoggingInterceptor } from './interceptors/logging.inteceptor';
+import { LoggingInterceptor } from './common/interceptors/logging.inteceptor'; 
 import 'dotenv/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
