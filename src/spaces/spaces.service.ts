@@ -72,11 +72,7 @@ export class SpacesService {
   async softDelete(id: number): Promise<Space> {
     const space = await this.validationService.getSpaceOrFail(id);
 
-    if (!space) {
-      throw new NotFoundException(`Space with id ${id} not found`);
-    }
-
-    if(space.status === "INACTIVE") { throw new ConflictException("Space is already INACTIVE") };
+    await this.validationService.ensureSpaceIsActive(space);
 
     const bookings = await this.prisma.reservation.findMany({
       where: { spaceId: id },

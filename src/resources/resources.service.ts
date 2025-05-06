@@ -75,9 +75,7 @@ export class ResourcesSevice {
   async softDelete(id: number) {
     const resource = await this.validationService.getResourceOrFail(id);
 
-    if (resource.status === 'INACTIVE') {
-      throw new BadRequestException('Resource is already inactive');
-    }
+    await this.validationService.ensureResourceIsActive(resource);
 
     return this.prisma.resource.update({
       where: { id },

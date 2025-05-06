@@ -105,7 +105,7 @@ export class UsersService {
   async softDelete(id: number) {
     const user = await this.validationService.getUserOrFail(id);
 
-    if(user.status === "INACTIVE") { throw new ConflictException("user is already INACTIVE") };
+    await this.validationService.ensureUserIsActive(user);
 
     return this.prisma.user.update({
       where: { id },
