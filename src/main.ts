@@ -15,6 +15,8 @@ async function bootstrap() {
 
   // app.useGlobalGuards(new AuthGuard(new JwtService())); // Deixei comentado por que isso ativa a proteção global de todas as rotas
 
+  app.setGlobalPrefix('api/v1');
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -27,7 +29,9 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle('Booking API')
-    .setDescription('API for managing reservations, users, spaces and resources.')
+    .setDescription(
+      'API for managing reservations, users, spaces and resources.',
+    )
     .setVersion('1.0')
     .addBearerAuth()
     .build();
