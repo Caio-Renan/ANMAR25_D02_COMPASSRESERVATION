@@ -125,7 +125,7 @@ export class AuthService {
                throw new BadRequestException('Token payload does not contain a valid user ID')
           }
 
-          const user = await this.userService.findById(userId);
+          const user = await this.userService.findOne(userId);
 
           if (!user) {
                throw new NotFoundException('No user found for the provided token')

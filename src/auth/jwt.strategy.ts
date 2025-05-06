@@ -28,7 +28,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       throw new Error('Invalid user ID');
     }
 
-    const user = await this.userService.findById(userId);  
+    const user = await this.userService.findOne(userId);  
     
     if (!user) {
       throw new Error('User not found');
