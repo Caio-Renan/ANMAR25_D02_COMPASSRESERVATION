@@ -20,6 +20,33 @@ import {
   getPaginationParams,
   buildPaginatedResponse,
 } from 'src/common/utils/pagination.util';
+
+const getSelectFields = () => ({
+  client: {
+    select: {
+      name: true,
+      cpf: true,
+      email: true,
+      phone: true,
+    },
+  },
+  space: {
+    select: {
+      name: true,
+    },
+  },
+  resources: {
+    select: {
+      quantity: true,
+      resource: {
+        select: {
+          name: true,
+        },
+      },
+    },
+  },
+});
+
 @Injectable()
 export class ReservationService {
   constructor(
@@ -51,7 +78,7 @@ export class ReservationService {
     await this.validationService.verifyClient(clientId);
     await this.validationService.updateQuantity(resources);
 
-    return this.prisma.reservation.create({
+    const reservation = await this.prisma.reservation.create({
       data: {
         clientId,
         spaceId,
@@ -61,8 +88,16 @@ export class ReservationService {
         resources: {
           create: resources,
         },
-      },
+      }, include: getSelectFields()
     });
+
+    return {
+      ...reservation,
+      resources: reservation.resources.map((r) => ({
+        resource: r.resource.name,
+        quantity: r.quantity,
+      })),
+    };
   }
 
   async findAll(filter: FilterReservationDto) {
@@ -110,21 +145,7 @@ export class ReservationService {
         where,
         skip,
         take,
-        include: {
-          client: {
-            select: {
-              name: true,
-              cpf: true,
-              email: true,
-              phone: true,
-            },
-          },
-          space: {
-            select: {
-              name: true,
-            },
-          },
-        },
+        include: getSelectFields()
       }),
       this.prisma.reservation.count({ where }),
     ]);
@@ -202,7 +223,7 @@ export class ReservationService {
       endDate: data.endDate,
     };
 
-    return this.prisma.reservation.update({ where: { id }, data: newData });
+    return this.prisma.reservation.update({ where: { id }, data: newData, include: getSelectFields() });
   }
 
   async softDelete(id: number) {
