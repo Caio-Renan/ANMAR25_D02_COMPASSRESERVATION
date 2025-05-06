@@ -1,5 +1,5 @@
 import { IsPersonName, IsCustomEmail, IsCustomPassword, IsFormattedPhoneNumber } from '../../common/decorators';
-export class CreateUserDTO {
+export class CreateUserDto {
     @IsPersonName()   
     name: string;
     
