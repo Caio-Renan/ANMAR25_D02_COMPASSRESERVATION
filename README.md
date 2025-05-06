@@ -63,8 +63,6 @@ MAIL_SECURE=false
 MAIL_USER=seuemail@gmail.com
 MAIL_PASS=suaSenha
 
-EMAIL_ENABLED=true
-
 JWT_SECRET=mysecretkey
 JWT_EXPIRATION=1d
 
