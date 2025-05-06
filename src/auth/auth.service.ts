@@ -10,6 +10,7 @@ import { User } from "@prisma/client";
 import { EmailService } from "src/email/email.service";
 import { AuthResetDto } from "./dto/auth-reset.dto";
 import { AuthVerifyEmailDto } from "./dto/auth-verify-email.dto";
+import { AuthValidateService } from "./authValidate.service";
 
 
 
@@ -26,7 +27,8 @@ export class AuthService {
           private readonly jwtService: JwtService,
           private readonly userService: UsersService,
           private readonly emailService: EmailService,
-     ) { }
+          private readonly validationService: AuthValidateService
+     ) {}
 
      private createToken(user: User) {
           return {
@@ -60,25 +62,11 @@ export class AuthService {
      }
 
      async login(dto: AuthLoginDto) {
-          const user = await this.prisma.user.findFirst({
-               where: {
-                    email: dto.email,
-               },
-          });
+          const user = await this.validationService.validateUserExistsByEmail(dto.email);
 
-          if (!user) {
-               throw new NotFoundException('Email not found');
-          }
+          await this.validationService.validateUserStatus(user);
 
-          if (user.status === 'INACTIVE') {
-               throw new ForbiddenException('User is inactive');
-          }
-
-          const isValidPassword = await bcrypt.compare(dto.password, user.password);
-
-          if (!isValidPassword) {
-               throw new UnauthorizedException('Invalid password');
-          }
+          await this.validationService.validatePassword(dto, user);
 
           return this.createToken(user);
      }
