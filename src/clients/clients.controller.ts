@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Get, Patch, Post, Query, Delete, UseGuards, ForbiddenException  } from '@nestjs/common';
+import { Body, Controller, Param, Get, Patch, Post, Query, Delete, UseGuards, ForbiddenException } from '@nestjs/common';
 import { ClientsService } from './clients.service';
 import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
@@ -15,7 +15,7 @@ import { AuthenticatedUser } from 'src/auth/types/authenticated-user';
 @Controller('clients')
 @UseGuards(AuthGuard('jwt'), RolesGuard)
 export class ClientsController {
-  constructor(private readonly clientsService: ClientsService) {}
+  constructor(private readonly clientsService: ClientsService) { }
 
   @ApiOperation({ summary: 'Create a new client' })
   @ApiBody({
@@ -69,9 +69,9 @@ export class ClientsController {
   @Patch(':id')
   async updatePartial(@Param() params: IdParamDto, @Body() dto: UpdateClientDto, @CurrentUser() user: AuthenticatedUser) {
 
-    if(user.role === Role.USER){
+    if (user.role === Role.USER) {
       const client = await this.clientsService.findById(params.id);
-      if(client?.userId !== user.id){
+      if (client?.userId !== user.id) {
         throw new ForbiddenException('Users can only update their own clients.')
       }
     }
@@ -96,12 +96,12 @@ export class ClientsController {
   @Roles(Role.ADMIN, Role.USER)
   @Get(':id')
   async findOne(@Param() params: IdParamDto, @CurrentUser() user: AuthenticatedUser) {
-      const client = await this.clientsService.findById(params.id);
+    const client = await this.clientsService.findById(params.id);
 
-      if(user.role === Role.USER && client.userId !== user.id){
+    if (user.role === Role.USER && client.userId !== user.id) {
 
-        throw new ForbiddenException('Users can only access their own clients.')
-      }
+      throw new ForbiddenException('Users can only access their own clients.')
+    }
     return client;
   }
 
@@ -113,5 +113,26 @@ export class ClientsController {
   @Delete(':id')
   async softDelete(@Param() params: IdParamDto) {
     return this.clientsService.softDelete(params.id);
+  }
+
+  @ApiOperation({ summary: 'Request email verification for a client' })
+  @ApiParam({ name: 'id', description: 'Client ID', example: 1 })
+  @ApiResponse({ status: 200, description: 'Verification email sent successfully', schema: { example: { message: 'A verification email has been sent successfully' } } })
+  @ApiResponse({ status: 403, description: 'Users can only request verification for their own clients.' })
+  @ApiResponse({ status: 404, description: 'Client not found' })
+  @Roles(Role.ADMIN, Role.USER)
+  @Post(':id/request-email-verification')
+  async requestEmailVerification(
+    @Param() params: IdParamDto,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    const client = await this.clientsService.findById(params.id);
+
+    if (user.role === Role.USER && client.userId !== user.id) {
+      throw new ForbiddenException('Users can only request verification for their own clients.');
+    }
+
+    await this.clientsService.validateMail(params.id);
+    return { message: `A verification email has been sent to ${client.email}` };
   }
 }
