@@ -87,7 +87,9 @@ describe('ClientsService', () => {
     service = module.get<ClientsService>(ClientsService);
     prismaService = module.get<PrismaService>(PrismaService);
     jwtService = module.get<JwtService>(JwtService);
-    validationService = module.get<ClientValidationService>(ClientValidationService);
+    validationService = module.get<ClientValidationService>(
+      ClientValidationService,
+    );
     emailService = module.get<EmailService>(EmailService);
   });
 
@@ -102,7 +104,9 @@ describe('ClientsService', () => {
 
       const result = await service.create(mockCreateClientDto, userId);
 
-      expect(validationService.validateClientFields).toHaveBeenCalledWith(mockCreateClientDto);
+      expect(validationService.validateClientFields).toHaveBeenCalledWith(
+        mockCreateClientDto,
+      );
       expect(prismaService.client.create).toHaveBeenCalledWith({
         data: {
           ...mockCreateClientDto,
@@ -118,12 +122,12 @@ describe('ClientsService', () => {
           subject: String(mockClient.id),
           issuer: 'email-verification',
           audience: 'clients',
-        }
+        },
       );
       expect(emailService.sendEmailVerification).toHaveBeenCalledWith(
         mockClient.email,
         mockClient.name,
-        'http://localhost:3000/auth/verify-email??token=mock-token'
+        'http://localhost:3000/api/v1/verify-email?token=mock-token',
       );
       expect(result).toEqual(mockClient);
     });
@@ -131,9 +135,13 @@ describe('ClientsService', () => {
     it('should throw an error if validation fails', async () => {
       const userId = 1;
       const validationError = new ConflictException('Validation failed');
-      jest.spyOn(validationService, 'validateClientFields').mockRejectedValue(validationError);
+      jest
+        .spyOn(validationService, 'validateClientFields')
+        .mockRejectedValue(validationError);
 
-      await expect(service.create(mockCreateClientDto, userId)).rejects.toThrow(validationError);
+      await expect(service.create(mockCreateClientDto, userId)).rejects.toThrow(
+        validationError,
+      );
     });
   });
 
@@ -148,7 +156,9 @@ describe('ClientsService', () => {
 
       const result = await service.update(clientId, mockUpdateClientDto);
 
-      expect(validationService.validateClientFields).toHaveBeenCalledWith(mockUpdateClientDto);
+      expect(validationService.validateClientFields).toHaveBeenCalledWith(
+        mockUpdateClientDto,
+      );
       expect(prismaService.client.update).toHaveBeenCalledWith({
         where: { id: clientId },
         data: {
@@ -163,16 +173,20 @@ describe('ClientsService', () => {
     it('should throw an error if validation fails during update', async () => {
       const clientId = 1;
       const validationError = new ConflictException('Validation failed');
-      jest.spyOn(validationService, 'validateClientFields').mockRejectedValue(validationError);
+      jest
+        .spyOn(validationService, 'validateClientFields')
+        .mockRejectedValue(validationError);
 
-      await expect(service.update(clientId, mockUpdateClientDto)).rejects.toThrow(validationError);
+      await expect(
+        service.update(clientId, mockUpdateClientDto),
+      ).rejects.toThrow(validationError);
     });
   });
 
   describe('findAll', () => {
     it('should return paginated clients with no filters', async () => {
       const filter = { page: 1, limit: 10 };
-      
+
       const result = await service.findAll(filter);
 
       expect(prismaService.client.findMany).toHaveBeenCalledWith({
@@ -202,7 +216,7 @@ describe('ClientsService', () => {
         status: Status.ACTIVE,
         cpf: '123',
       };
-      
+
       await service.findAll(filter);
 
       expect(prismaService.client.findMany).toHaveBeenCalledWith({
@@ -222,17 +236,22 @@ describe('ClientsService', () => {
   describe('findById', () => {
     it('should return a client by id', async () => {
       const clientId = 1;
-      
+
       const result = await service.findById(clientId);
 
-      expect(validationService.getClientOrFail).toHaveBeenCalledWith(clientId, expect.any(Object));
+      expect(validationService.getClientOrFail).toHaveBeenCalledWith(
+        clientId,
+        expect.any(Object),
+      );
       expect(result).toEqual(mockClient);
     });
 
     it('should throw an error if client is not found', async () => {
       const clientId = 999;
       const notFoundError = new NotFoundException('Client not found');
-      jest.spyOn(validationService, 'getClientOrFail').mockRejectedValue(notFoundError);
+      jest
+        .spyOn(validationService, 'getClientOrFail')
+        .mockRejectedValue(notFoundError);
 
       await expect(service.findById(clientId)).rejects.toThrow(notFoundError);
     });
@@ -246,13 +265,17 @@ describe('ClientsService', () => {
         status: Status.INACTIVE,
         updatedAt: expect.any(Date),
       };
-      
-      jest.spyOn(prismaService.client, 'update').mockResolvedValue(deletedClient);
+
+      jest
+        .spyOn(prismaService.client, 'update')
+        .mockResolvedValue(deletedClient);
 
       const result = await service.softDelete(clientId);
 
       expect(validationService.getClientOrFail).toHaveBeenCalledWith(clientId);
-      expect(validationService.ensureClientIsActive).toHaveBeenCalledWith(mockClient);
+      expect(validationService.ensureClientIsActive).toHaveBeenCalledWith(
+        mockClient,
+      );
       expect(prismaService.client.update).toHaveBeenCalledWith({
         where: { id: clientId },
         data: {
@@ -267,7 +290,9 @@ describe('ClientsService', () => {
     it('should throw an error if client is not active', async () => {
       const clientId = 1;
       const inactiveError = new ConflictException('Client is not active');
-      jest.spyOn(validationService, 'ensureClientIsActive').mockRejectedValue(inactiveError);
+      jest
+        .spyOn(validationService, 'ensureClientIsActive')
+        .mockRejectedValue(inactiveError);
 
       await expect(service.softDelete(clientId)).rejects.toThrow(inactiveError);
     });

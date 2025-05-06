@@ -5,7 +5,7 @@ import {
   NotAcceptableException,
   NotFoundException,
 } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import {
   CreateReservationDto,
   CreateReservationResourceDto,
@@ -14,12 +14,12 @@ import { ReservationValidationService } from './reservationsValidate.service';
 import { Prisma, Reservation, ReservationStatus } from '@prisma/client';
 import { UpdateReservationDto } from './dto/update-reservation-dto';
 import ical from 'ical-generator';
-import { EmailService } from 'src/email/email.service';
+import { EmailService } from '../email/email.service';
 import { FilterReservationDto } from './dto/filter-reservation.dto';
 import {
   getPaginationParams,
   buildPaginatedResponse,
-} from 'src/common/utils/pagination.util';
+} from '../common/utils/pagination.util';
 
 const getSelectFields = () => ({
   client: {
@@ -86,7 +86,8 @@ export class ReservationService {
         resources: {
           create: resources,
         },
-      }, include: getSelectFields()
+      },
+      include: getSelectFields(),
     });
 
     return {
@@ -143,7 +144,7 @@ export class ReservationService {
         where,
         skip,
         take,
-        include: getSelectFields()
+        include: getSelectFields(),
       }),
       this.prisma.reservation.count({ where }),
     ]);
@@ -154,7 +155,7 @@ export class ReservationService {
   async findOne(id: number): Promise<Reservation | null> {
     await this.exists(id);
     return this.prisma.reservation.findUnique({
-      where: { id }, 
+      where: { id },
       include: getSelectFields(),
     });
   }
@@ -222,7 +223,11 @@ export class ReservationService {
       endDate: data.endDate,
     };
 
-    return this.prisma.reservation.update({ where: { id }, data: newData, include: getSelectFields() });
+    return this.prisma.reservation.update({
+      where: { id },
+      data: newData,
+      include: getSelectFields(),
+    });
   }
 
   async softDelete(id: number) {
