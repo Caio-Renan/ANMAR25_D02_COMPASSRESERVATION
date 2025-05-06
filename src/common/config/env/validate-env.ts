@@ -3,7 +3,7 @@ import { validateSync } from 'class-validator';
 import { EnvironmentDTO } from './env.dto';
 import { requiredEnvVars } from './required-env-vars';
 import { Environment } from './env.enum';
-import { CreateUserDTO } from '../../../users/dto/create-user.dto';
+import { CreateUserDto } from '../../../users/dto/create-user.dto';
 
 export type ValidatedEnv = {
   NODE_ENV: Environment;
@@ -50,14 +50,14 @@ export function validateEnv(config: Record<string, unknown>): ValidatedEnv {
     errors.push('Environment variable errors:\n' + envMessages.join('\n'));
   }
 
-  const userDTO = plainToInstance(CreateUserDTO, {
+  const userDTO = plainToInstance(CreateUserDto, {
     name: config.DEFAULT_USER_NAME,
     email: config.DEFAULT_USER_EMAIL,
     password: config.DEFAULT_USER_PASSWORD,
     phone: config.DEFAULT_USER_PHONE,
   });
 
-  const adminDTO = plainToInstance(CreateUserDTO, {
+  const adminDTO = plainToInstance(CreateUserDto, {
     name: config.DEFAULT_ADMIN_NAME,
     email: config.DEFAULT_ADMIN_EMAIL,
     password: config.DEFAULT_ADMIN_PASSWORD,

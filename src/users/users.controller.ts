@@ -1,8 +1,8 @@
 import { Body, Controller, Get, Patch, Param, Post, Query, Delete, UseGuards, Req, ForbiddenException } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDTO } from './dto/create-user.dto';
-import { UpdateUserDTO } from './dto/update-user.dto';
-import { FilterUserDTO } from './dto/filter-user.dto';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { FilterUserDto } from './dto/filter-user.dto';
 import { ApiTags, ApiOperation, ApiBody, ApiResponse, ApiQuery, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
 import { Roles } from '../common/decorators/roles.decorator';
 import { Role } from '../common/enum/roles.enum';
@@ -10,7 +10,6 @@ import { RolesGuard } from '../common/guards/roles.guard';
 import { Request } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { CurrentUser } from 'src/common/decorators';
-import { P } from 'pino';
 import { IdParamDto } from 'src/common/dto/id-param.dto';
 @ApiTags('Users')
 @ApiBearerAuth()
@@ -20,7 +19,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
   @ApiOperation({ summary: 'Create a new user' })
   @ApiBody({
-    type: CreateUserDTO,
+    type: CreateUserDto,
     examples: {
       default: {
         summary: 'Example Create User Body',
@@ -41,14 +40,14 @@ export class UsersController {
   @ApiResponse({ status: 400, description: 'Validation error' })
   @Roles(Role.ADMIN)
   @Post()
-  async create(@Body() dto: CreateUserDTO) {
+  async create(@Body() dto: CreateUserDto) {
     return this.usersService.create(dto);
   }
 
   @ApiOperation({ summary: 'Update a user partially' })
   @ApiParam({ name: 'id', description: 'User ID', example: 1 })
   @ApiBody({
-    type: UpdateUserDTO,
+    type: UpdateUserDto,
     examples: {
       default: {
         summary: 'Example Update User Body',
@@ -70,7 +69,7 @@ export class UsersController {
   @Patch(':id')
   async updatePartial(
     @Param() params: IdParamDto,
-    @Body() dto: UpdateUserDTO,
+    @Body() dto: UpdateUserDto,
     @Req() req: Request
   ) {
     const user = req.user as any;  
@@ -83,7 +82,7 @@ export class UsersController {
   @ApiResponse({ status: 200, description: 'List of users', schema: { example: [{ id: 1, name: 'Thiago Sampaio', email: 'Thiago.sampaio@compass.com' }] } })
   @Roles(Role.ADMIN)
   @Get()
-  async findAll(@Query() filter: FilterUserDTO) {
+  async findAll(@Query() filter: FilterUserDto) {
     return this.usersService.findAll(filter);
   }
 
@@ -97,7 +96,7 @@ export class UsersController {
     if( user.role === Role.USER && user.id !== params.id){
       throw new ForbiddenException('Users can only access their own data.')
     }
-    return this.usersService.findById(params.id);
+    return this.usersService.findOne(params.id);
   }
 
   @ApiOperation({ summary: 'Soft delete a user by ID' })
