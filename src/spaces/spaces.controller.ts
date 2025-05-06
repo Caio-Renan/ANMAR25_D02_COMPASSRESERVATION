@@ -10,6 +10,7 @@ import { RolesGuard } from "src/common/guards/roles.guard";
 import { IdParamDto } from "src/common/dto/id-param.dto";
 import { FilterSpaceDto } from "./dto/filter-space.dto";
 import { ThrottlerGuard } from "@nestjs/throttler";
+
 @ApiTags('Spaces')
 @ApiBearerAuth()
 @Controller('spaces')
@@ -46,27 +47,33 @@ export class SpacesController {
   @ApiOperation({ summary: 'Get all spaces' })
   @ApiQuery({ name: 'page', description: 'Page number', required: false, example: 1 })
   @ApiQuery({ name: 'limit', description: 'Number of items per page', required: false, example: 10 })
+  @ApiQuery({ name: 'name', description: 'Filter by name', required: false, example: 'Conference Room' })
+  @ApiQuery({ name: 'capacity', description: 'Filter by capacity (greater than or equal to)', required: false, example: 10 })
+  @ApiQuery({ name: 'status', enum: ['ACTIVE', 'INACTIVE'], description: 'Filter by status', required: false })
   @ApiResponse({
     status: 200, description: 'List of spaces',
     schema: {
-      example:
-        [{
-          id: 1, name: 'Conference Room A',
-          description: 'A large conference room with a projector', capacity: 50
-        }]
+      example: {
+        data: [
+          { id: 1, name: 'Conference Room A', description: 'A large conference room with a projector', capacity: 50, status: 'ACTIVE', createdAt: '2023-01-01T10:00:00.000Z', updatedAt: '2023-01-01T10:00:00.000Z' },
+        ],
+        total: 1,
+        currentPage: 1,
+        totalPages: 1,
+      },
     }
   })
-  @Roles(Role.ADMIN, Role.USER) 
+  @Roles(Role.ADMIN, Role.USER)
   @Get()
   async findAll(@Query() filter: FilterSpaceDto) {
-      return this.spacesService.findAll(filter);
+    return this.spacesService.findAll(filter);
   }
 
   @ApiOperation({ summary: 'Get a space by ID' })
   @ApiParam({ name: 'id', description: 'Space ID', example: 1 })
-  @ApiResponse({ status: 200, description: 'Space found', schema: { example: { id: 1, name: 'Conference Room A', description: 'A large conference room with a projector', capacity: 50 } } })
+  @ApiResponse({ status: 200, description: 'Space found', schema: { example: { id: 1, name: 'Conference Room A', description: 'A large conference room with a projector', capacity: 50, status: 'ACTIVE', createdAt: '2023-01-01T10:00:00.000Z', updatedAt: '2023-01-01T10:00:00.000Z' } } })
   @ApiResponse({ status: 404, description: 'Space not found' })
-  @Roles(Role.ADMIN, Role.USER) 
+  @Roles(Role.ADMIN, Role.USER)
   @Get(':id')
   async findOne(@Param() params: IdParamDto) {
     return this.spacesService.findOne(params.id);
@@ -96,12 +103,13 @@ export class SpacesController {
     schema: {
       example: {
         id: 1, name: 'Updated Conference Room A',
-        description: 'Updated description', capacity: 60
+        description: 'Updated description', capacity: 60, status: 'ACTIVE', createdAt: '2023-01-01T10:00:00.000Z', updatedAt: '2023-01-01T11:00:00.000Z'
       }
     }
   })
   @ApiResponse({ status: 400, description: 'Validation error' })
-  @Roles(Role.ADMIN) 
+  @ApiResponse({ status: 404, description: 'Space not found' })
+  @Roles(Role.ADMIN)
   @Patch(':id')
   async update(@Param() params: IdParamDto, @Body(new ValidationPipe()) dto: UpdateSpaceDto) {
     return this.spacesService.update(params.id, dto);
@@ -109,9 +117,9 @@ export class SpacesController {
 
   @ApiOperation({ summary: 'Delete a space by ID' })
   @ApiParam({ name: 'id', description: 'Space ID', example: 1 })
-  @ApiResponse({ status: 200, description: 'Space deleted successfully' })
+  @ApiResponse({ status: 200, description: 'Space deleted successfully', schema: { example: { id: 1, name: 'Updated Conference Room A', description: 'Updated description', capacity: 60, status: 'INACTIVE', createdAt: '2023-01-01T10:00:00.000Z', updatedAt: '2023-01-01T11:00:00.000Z' } } })
   @ApiResponse({ status: 404, description: 'Space not found' })
-  @Roles(Role.ADMIN) 
+  @Roles(Role.ADMIN)
   @Delete(':id')
   async delete(@Param() params: IdParamDto) {
     return this.spacesService.softDelete(params.id);
