@@ -51,7 +51,6 @@ export class UsersService {
       throw new ForbiddenException('You do not have permission to update this user');
     }
   
-    await this.isIdValueCorrect(id);
     const existingUser = await this.checkIfUserExists(id);
   
     if (dto.email && dto.email !== existingUser.email) {
@@ -117,16 +116,11 @@ export class UsersService {
   }
 
   async findOne(id: number) {
-    await this.isIdValueCorrect(id);
-
     const user = await this.checkIfUserExists(id, userSelectWithoutPassword);
     return user;
   }
 
   async softDelete(id: number) {
-
-    await this.isIdValueCorrect(id);
-
     const user = await this.checkIfUserExists(id);
 
     if(user.status === "INACTIVE") { throw new ConflictException("user is already INACTIVE") };
@@ -138,14 +132,6 @@ export class UsersService {
         updatedAt: new Date(),
       }, select: userSelectWithoutPassword
     });
-  }
-
-  async isIdValueCorrect(id: number) {
-    if (Number.isNaN(id)) {
-      throw new BadRequestException('id must be a number');
-    }
-
-    if (id < 1) { throw new BadRequestException('id must be greater than or equal to 1');}
   }
 
   async checkIfUserExists(id: number, select?: Prisma.UserSelect): Promise<User> {
