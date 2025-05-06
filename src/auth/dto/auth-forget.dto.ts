@@ -1,12 +1,5 @@
-import { Transform } from "class-transformer";
-import { IsEmail, IsString, MaxLength } from "class-validator";
-
-
+import { IsCustomEmail } from "src/common/decorators";
 export class AuthForgetDto {
-
-     @IsEmail()
-     @IsString()
-     @MaxLength(150)
-     @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+     @IsCustomEmail()
      email: string;
 }
