@@ -142,7 +142,7 @@ export class ResourcesController {
   @Roles(Role.ADMIN)
   @Patch(':id')
   async update(@Body() dto: CreateResourceDto, @Param() params: IdParamDto) {
-    return this.resourcesService.updatePartial(params.id, dto);
+    return this.resourcesService.update(params.id, dto);
 
   }
 
