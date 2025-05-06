@@ -96,7 +96,7 @@ export class UsersController {
     if( user.role === Role.USER && user.id !== params.id){
       throw new ForbiddenException('Users can only access their own data.')
     }
-    return this.usersService.findById(params.id);
+    return this.usersService.findOne(params.id);
   }
 
   @ApiOperation({ summary: 'Soft delete a user by ID' })

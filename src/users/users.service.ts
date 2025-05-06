@@ -116,7 +116,7 @@ export class UsersService {
     return buildPaginatedResponse(data, total, page, limit);
   }
 
-  async findById(id: number) {
+  async findOne(id: number) {
     await this.isIdValueCorrect(id);
 
     const user = await this.checkIfUserExists(id, userSelectWithoutPassword);
