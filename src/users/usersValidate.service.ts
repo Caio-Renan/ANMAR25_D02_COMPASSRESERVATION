@@ -8,7 +8,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { Prisma, User } from '@prisma/client';
 
 @Injectable()
-export class ClientValidationService {
+export class UserValidationService {
     constructor(private readonly prisma: PrismaService) {}
     async validateUserFields(dto: UpdateUserDto) {
         if (dto.email) {
