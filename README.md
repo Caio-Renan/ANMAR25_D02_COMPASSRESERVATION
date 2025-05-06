@@ -18,6 +18,14 @@ The API provides full **CRUD** functionality and business rules for the followin
 - **Resources**: Items or equipment available for booking
 - **Reservations**: Booking management with conflict validation
 
+# In this project, you can access various sections. Click the links below to navigate:
+
+- [API Endpoints](#api-endpoints)
+- [Authentication](#authentication)
+
+
+## API Endpoints
+
 ## 💻 Technologies
 
 ### Backend
@@ -109,6 +117,57 @@ Npm run seed
 
 Access the `/api` endpoint after starting the server to view the API documentation generated with Swagger.
 
+# API Endpoints
+
+- `POST /api/v1/login` - User login
+- `POST /api/v1/register` - User registration
+- `GET /api/v1/me` - Get current user information
+- `POST /api/v1/forget` - Request password reset
+- `POST /api/v1/reset` - Reset password
+- `GET /api/v1/verify-email` - Verify email address
+
+## Users
+
+- `POST /api/v1/users` - Create a new user
+- `PATCH /api/v1/users/:id` - Update user information
+- `GET /api/v1/users` - Get list of users
+- `GET /api/v1/users/:id` - Get a single user by ID
+- `DELETE /api/v1/users/:id` - Delete a user
+
+## Reservations
+
+- `POST /api/v1/reservations` - Create a new reservation
+- `GET /api/v1/reservations` - Get list of reservations
+- `GET /api/v1/reservations/:id` - Get reservation by ID
+- `PATCH /api/v1/reservations/:id` - Update a reservation
+- `DELETE /api/v1/reservations/:id` - Delete a reservation
+
+## Spaces
+
+- `POST /api/v1/spaces` - Create a new space
+- `GET /api/v1/spaces` - Get list of spaces
+- `GET /api/v1/spaces/:id` - Get space by ID
+- `PATCH /api/v1/spaces/:id` - Update a space
+- `DELETE /api/v1/spaces/:id` - Delete a space
+
+## Resources
+
+- `POST /api/v1/resources` - Create a new resource
+- `GET /api/v1/resources` - Get list of resources
+- `GET /api/v1/resources/:id` - Get resource by ID
+- `PATCH /api/v1/resources/:id` - Update a resource
+- `DELETE /api/v1/resources/:id` - Delete a resource
+
+## Clients
+
+- `POST /api/v1/clients` - Create a new client
+- `PATCH /api/v1/clients/:id` - Update client information
+- `GET /api/v1/clients` - Get list of clients
+- `GET /api/v1/clients/:id` - Get client by ID
+- `DELETE /api/v1/clients/:id` - Delete a client
+
+
+
 ## 📁 Folder Structure
 
 ```
@@ -141,6 +200,7 @@ npm run dev
 * localhost:3000/api/v1/register
  In case you don't use the seed in the .env
 
+# Authentication
 
 ## 🔑 Authentication and Token Usage (In case you use the seed)
 
