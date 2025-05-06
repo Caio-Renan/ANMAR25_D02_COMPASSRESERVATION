@@ -1,24 +1,11 @@
 import 'reflect-metadata';
-import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
-import pino from 'pino';
 import { config as loadEnv } from 'dotenv';
 import { validateEnv } from '../src/common/config/env/validate-env';
+import { logger } from '../src/common/config/logger';
+import { prisma } from '../src/common/config/prisma';
 
 loadEnv();
-
-const isDev = process.env.NODE_ENV !== 'production';
-const prisma = new PrismaClient();
-const logger = pino({
-  transport: isDev
-    ? {
-        target: 'pino-pretty',
-        options: {
-          colorize: true,
-        },
-      }
-    : undefined,
-});
 
 async function main() {
   const env = validateEnv(process.env);
