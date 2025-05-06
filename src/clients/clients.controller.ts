@@ -10,10 +10,11 @@ import { Role } from 'src/common/enum/roles.enum';
 import { CurrentUser, Roles } from 'src/common/decorators';
 import { IdParamDto } from 'src/common/dto/id-param.dto';
 import { AuthenticatedUser } from 'src/auth/types/authenticated-user';
+import { ThrottlerGuard } from '@nestjs/throttler';
 @ApiTags('Clients')
 @ApiBearerAuth()
 @Controller('clients')
-@UseGuards(AuthGuard('jwt'), RolesGuard)
+@UseGuards(ThrottlerGuard, AuthGuard('jwt'), RolesGuard)
 export class ClientsController {
   constructor(private readonly clientsService: ClientsService) { }
 

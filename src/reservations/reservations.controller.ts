@@ -31,10 +31,11 @@ import { Role } from 'src/common/enum/roles.enum';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { IdParamDto } from 'src/common/dto/id-param.dto';
 import { AuthenticatedUser } from 'src/auth/types/authenticated-user';
+import { ThrottlerGuard } from '@nestjs/throttler';
 @ApiTags('Reservations')
 @ApiBearerAuth()
 @Controller('reservations')
-@UseGuards(AuthGuard('jwt'), RolesGuard)
+@UseGuards(ThrottlerGuard, AuthGuard('jwt'), RolesGuard)
 export class ReservationController {
   constructor(private readonly reservationService: ReservationService) {}
 

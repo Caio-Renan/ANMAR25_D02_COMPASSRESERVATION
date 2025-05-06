@@ -7,8 +7,10 @@ import { CurrentUser } from "src/common/decorators/current-user.decorator";
 import { AuthResetDto } from "./dto/auth-reset.dto";
 import { AuthGuard } from '@nestjs/passport';
 import { ApiTags, ApiOperation, ApiBody, ApiResponse, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
+import { Throttle, ThrottlerGuard } from "@nestjs/throttler";
 
 @ApiTags('Auth')
+@UseGuards(ThrottlerGuard)
 @Controller()
 export class AuthController {
   constructor(private readonly authService: AuthService) {}

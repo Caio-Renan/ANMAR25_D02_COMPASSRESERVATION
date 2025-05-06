@@ -12,10 +12,11 @@ import { AuthGuard } from '@nestjs/passport';
 import { CurrentUser } from 'src/common/decorators';
 import { IdParamDto } from 'src/common/dto/id-param.dto';
 import { AuthenticatedUser } from 'src/auth/types/authenticated-user';
+import { ThrottlerGuard } from '@nestjs/throttler';
 @ApiTags('Users')
 @ApiBearerAuth()
 @Controller('users')
-@UseGuards(AuthGuard('jwt'), RolesGuard)
+@UseGuards(ThrottlerGuard, AuthGuard('jwt'), RolesGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
   @ApiOperation({ summary: 'Create a new user' })
