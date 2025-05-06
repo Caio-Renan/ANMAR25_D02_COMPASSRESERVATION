@@ -33,12 +33,8 @@ export class AuthValidateService {
     }
   }
   
-  async validateUserExistenceForRecovery(email: string) {
-    const user = await this.prisma.user.findFirst({ where: { email } });
-    if (!user) {
-      return null;
-    }
-    return 'If the email exists, a recovery link has been sent';
+  async validateUserExistsForRecovery(email: string) {
+    return this.prisma.user.findFirst({ where: { email } });
   }
   
   async validateUserFromToken(userId: string) {
