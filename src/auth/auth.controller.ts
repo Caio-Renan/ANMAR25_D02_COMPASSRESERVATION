@@ -5,7 +5,6 @@ import { AuthForgetDto } from "./dto/auth-forget.dto";
 import { AuthRegisterDto } from "./dto/auth-register.dto";
 import { CurrentUser } from "src/common/decorators/current-user.decorator";
 import { AuthResetDto } from "./dto/auth-reset.dto";
-import { AuthVerifyEmailDto } from "./dto/auth-verify-email.dto";
 import { AuthGuard } from '@nestjs/passport';
 import { ApiTags, ApiOperation, ApiBody, ApiResponse, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
 
@@ -131,7 +130,7 @@ export class AuthController {
   @ApiResponse({ status: 400, description: 'Invalid or expired token' })
   @ApiResponse({ status: 404, description: 'User not found for the provided token' })
   @Get('verify-email')
-  async verifyEmail(@Query('token') dto: AuthVerifyEmailDto) {
-    return this.authService.verifyEmail(dto);
+  async verifyEmail(@Query('token') token: string) {
+    return this.authService.verifyEmail(token);
   }
 }
