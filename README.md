@@ -57,7 +57,7 @@ DEFAULT_USER_PASSWORD=Us3r@1234
 DEFAULT_USER_PHONE=+55 (81) 99999-9999
 NODE_ENV=development
 
-MAIL_HOST=smtp.gmail.com
+MAIL_HOST=smtp.ethereal.email
 MAIL_PORT=587
 MAIL_SECURE=false
 MAIL_USER=seuemail@gmail.com
@@ -258,7 +258,7 @@ Make sure to store the token securely in your development environment or client 
 3. In your project, edit the `.env` file with the following variables:
 
 ```env
-MAIL_HOST=smtp.ethereal.email
+MAIL_HOST=smtp.ethereal.email <-- If you are going to use Gmail, put smtp.gmail.email in the .env!
 MAIL_PORT=587
 MAIL_USER=your-generated-email@ethereal.email
 MAIL_PASSWORD=your-generated-password
