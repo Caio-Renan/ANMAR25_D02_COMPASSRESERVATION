@@ -20,7 +20,7 @@ The API provides full **CRUD** functionality and business rules for the followin
 
 # In this project, you can access various sections. Click the links below to navigate:
 
-- [API Endpoints](#api-endpoints)
+- [Endpoints](#endpoints)
 - [Authentication](#authentication)
 
 
@@ -117,7 +117,7 @@ Npm run seed
 
 Access the `/api` endpoint after starting the server to view the API documentation generated with Swagger.
 
-# API Endpoints
+# Endpoints
 
 - `POST /api/v1/login` - User login
 - `POST /api/v1/register` - User registration
