@@ -79,9 +79,7 @@ export class AuthService {
      }
 
      async forget(dto: AuthForgetDto) {
-          const user = await this.prisma.user.findFirst({
-               where: { email: dto.email },
-          });
+          const user = await this.validationService.validateUserExistsForRecovery(dto.email);
 
           if (!user) {
                return { message: 'If the email exists, a recovery link has been sent' };
