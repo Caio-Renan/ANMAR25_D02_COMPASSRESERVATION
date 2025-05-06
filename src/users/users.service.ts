@@ -23,17 +23,7 @@ export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(dto: CreateUserDto) {
-    const existingEmail = await this.prisma.user.findUnique({
-      where: { email: dto.email },
-    });
-
-    if (existingEmail) throw new ConflictException('email already registered');
-
-    const existingPhone = await this.prisma.user.findUnique({
-        where: { phone: dto.phone },
-    });
-    
-    if (existingPhone) throw new ConflictException('phone already registered');
+    await this.validateUserFields(dto);
     
     const hash = await bcrypt.hash(dto.password, 10);
 
@@ -51,21 +41,9 @@ export class UsersService {
       throw new ForbiddenException('You do not have permission to update this user');
     }
   
-    const existingUser = await this.findClientOrThrow(id);
+    const existingUser = await this.findUserOrThrow(id);
   
-    if (dto.email && dto.email !== existingUser.email) {
-      const emailExists = await this.prisma.user.findUnique({
-        where: { email: dto.email },
-      });
-      if (emailExists) throw new ConflictException('Email already in use');
-    }
-  
-    if (dto.phone && dto.phone !== existingUser.phone) {
-      const phoneExists = await this.prisma.user.findUnique({
-        where: { phone: dto.phone },
-      });
-      if (phoneExists) throw new ConflictException('Phone number already in use');
-    }
+    await this.validateUserFields(dto);
   
     let password = existingUser.password;
     if (dto.password) {
@@ -116,12 +94,12 @@ export class UsersService {
   }
 
   async findOne(id: number) {
-    const user = await this.findClientOrThrow(id, userSelectWithoutPassword);
+    const user = await this.findUserOrThrow(id, userSelectWithoutPassword);
     return user;
   }
 
   async softDelete(id: number) {
-    const user = await this.findClientOrThrow(id);
+    const user = await this.findUserOrThrow(id);
 
     if(user.status === "INACTIVE") { throw new ConflictException("user is already INACTIVE") };
 
@@ -134,7 +112,19 @@ export class UsersService {
     });
   }
 
-  async findClientOrThrow(id: number, select?: Prisma.UserSelect): Promise<User> {
+  async validateUserFields(dto: UpdateUserDto) {
+    if (dto.email) {
+      const emailExists = await this.prisma.user.findUnique({ where: { email: dto.email } });
+      if (emailExists) throw new ConflictException('Email already registered');
+    }
+
+    if (dto.phone) {
+      const phoneExists = await this.prisma.user.findUnique({ where: { phone: dto.phone } });
+      if (phoneExists) throw new ConflictException('Phone already registered');
+    }
+  }
+
+  async findUserOrThrow(id: number, select?: Prisma.UserSelect): Promise<User> {
     const user = await this.prisma.user.findUnique({
       where: { id }, select: select
     });
