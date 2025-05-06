@@ -71,8 +71,6 @@ export class ReservationService {
       throw new NotFoundException('Space not found or is inactive');
     }
 
-    console.log('No service de reservation: ', resources);
-
     await this.validationService.isResourceActiveAndEnough(resources);
     await this.validationService.isDateAvailable(spaceId, startDate, endDate);
     await this.validationService.verifyClient(clientId);
