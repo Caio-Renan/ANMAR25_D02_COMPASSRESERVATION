@@ -61,6 +61,11 @@ export class ReservationValidationService {
       );
     }
 
+    const dateNow = new Date();
+    if (endDate < dateNow || startDate < dateNow) {
+      throw new BadRequestException('Invalid date');
+    }
+
     const conflictingReservations = await this.prisma.reservation.findFirst({
       where: {
         spaceId,
