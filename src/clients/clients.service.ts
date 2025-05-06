@@ -2,14 +2,14 @@ import {
   Injectable,
   ConflictException,
 } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { Prisma, Client } from '@prisma/client';
 import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
 import { FilterClientDto } from './dto/filter-client.dto';
 import { getPaginationParams, buildPaginatedResponse } from '../common/utils/pagination.util';
 import { JwtService } from '@nestjs/jwt';
-import { EmailService } from 'src/email/email.service';
+import { EmailService } from '../email/email.service';
 import { ClientValidationService } from './clientsValidate.service';
 
 const clientSelect: Prisma.ClientSelect = {

@@ -14,9 +14,6 @@ async function bootstrap() {
 
   app.use(helmet());
   app.enableCors();
-
-  // app.useGlobalGuards(new AuthGuard(new JwtService())); // Deixei comentado por que isso ativa a proteção global de todas as rotas
-
   app.setGlobalPrefix('api/v1');
 
   app.useGlobalPipes(
@@ -28,7 +25,6 @@ async function bootstrap() {
   );
 
   app.useGlobalInterceptors(new LoggingInterceptor());
-
   const config = new DocumentBuilder()
     .setTitle('Booking API')
     .setDescription(
