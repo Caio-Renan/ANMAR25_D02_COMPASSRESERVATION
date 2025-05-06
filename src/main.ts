@@ -3,13 +3,16 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { AuthGuard } from './common/guards/auth.guard';
 import { JwtService } from '@nestjs/jwt';
-import { LoggingInterceptor } from './common/interceptors/logging.inteceptor'; 
+import { LoggingInterceptor } from './common/interceptors/logging.inteceptor';
 import 'dotenv/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import helmet from 'helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableShutdownHooks();
+
+  app.use(helmet());
   app.enableCors();
   app.setGlobalPrefix('api/v1');
 
@@ -22,7 +25,6 @@ async function bootstrap() {
   );
 
   app.useGlobalInterceptors(new LoggingInterceptor());
-
   const config = new DocumentBuilder()
     .setTitle('Booking API')
     .setDescription(
