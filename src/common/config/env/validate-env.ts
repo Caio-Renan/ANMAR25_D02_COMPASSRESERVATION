@@ -9,7 +9,7 @@ export type ValidatedEnv = {
   NODE_ENV: Environment;
   DATABASE_URL: string;
   APP_URL: string;
-  EMAIL_ENABLED: string;
+
   MAIL_USER?: string;
   MAIL_PASS?: string;
   DEFAULT_USER_NAME: string;
@@ -90,7 +90,6 @@ export function validateEnv(config: Record<string, unknown>): ValidatedEnv {
     NODE_ENV: envConfig.NODE_ENV,
     DATABASE_URL: envConfig.DATABASE_URL,
     APP_URL: envConfig.APP_URL,
-    EMAIL_ENABLED: envConfig.EMAIL_ENABLED,
     MAIL_USER: envConfig.MAIL_USER,
     MAIL_PASS: envConfig.MAIL_PASS,
     PORT: envConfig.PORT,
