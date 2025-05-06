@@ -154,7 +154,8 @@ export class ReservationService {
   async findOne(id: number): Promise<Reservation | null> {
     await this.exists(id);
     return this.prisma.reservation.findUnique({
-      where: { id },
+      where: { id }, 
+      include: getSelectFields(),
     });
   }
 
