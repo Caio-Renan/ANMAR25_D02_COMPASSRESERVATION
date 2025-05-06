@@ -173,7 +173,6 @@ src/
 ├── clients/          # Clients module
 ├── common/           # Reusable filters, interceptors, DTOs, and decorators
 ├── email/            # Email module
-├── interceptors/     # Interceptors for request/response handling
 ├── prisma/           # Database access service via Prisma
 ├── reservations/     # Reservations module
 ├── resources/        # Resources module
