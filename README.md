@@ -18,13 +18,11 @@ The API provides full **CRUD** functionality and business rules for the followin
 - **Resources**: Items or equipment available for booking
 - **Reservations**: Booking management with conflict validation
 
-# In this project, you can access various sections. Click the links below to navigate:
+### In this project, you can access various sections. Click the links below to navigate:
 
 - [Endpoints](#endpoints)
 - [Authentication](#authentication)
 
-
-## API Endpoints
 
 ## 💻 Technologies
 
