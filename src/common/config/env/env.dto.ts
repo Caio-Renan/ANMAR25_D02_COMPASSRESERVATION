@@ -1,7 +1,7 @@
 import { IsEnum, Matches, IsBooleanString, IsEmail, IsNotEmpty, ValidateIf, IsUrl, IsNumberString, IsString } from 'class-validator';
 import { Environment } from './env.enum';
 
-export class EnvironmentDTO {
+export class EnvironmentDto {
   @IsEnum(Environment, { message: 'NODE_ENV must be one of: development, production, test' })
   NODE_ENV: Environment;
 
