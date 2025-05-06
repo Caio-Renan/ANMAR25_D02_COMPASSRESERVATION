@@ -2,6 +2,7 @@ import {
     Injectable,
     NotFoundException,
     ConflictException,
+    BadRequestException
   } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateResourceDto } from './dto/update-resource.dto';
@@ -23,5 +24,11 @@ export class ResourceValidationService {
         if (!resource) throw new NotFoundException('Resource not found');
     
         return resource;
+      }
+
+      async ensureResourceIsActive(resource: Resource) {
+        if (resource.status === 'INACTIVE') {
+          throw new BadRequestException('Resource is already inactive');
+        }
       }
 }

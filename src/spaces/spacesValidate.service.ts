@@ -2,6 +2,7 @@ import {
     Injectable,
     NotFoundException,
     ConflictException,
+    BadRequestException
   } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateSpaceDto } from './dto/update-space.dto';
@@ -23,5 +24,11 @@ export class SpaceValidationService {
         if (!space) throw new NotFoundException('Space not found');
     
         return space;
+      }
+      
+      async ensureSpaceIsActive(space: Space) {
+        if (space.status === 'INACTIVE') {
+          throw new BadRequestException('Space is already inactive');
+        }
       }
 }

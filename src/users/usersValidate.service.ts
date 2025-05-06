@@ -2,6 +2,7 @@ import {
     Injectable,
     NotFoundException,
     ConflictException,
+    BadRequestException
   } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -33,4 +34,10 @@ export class UserValidationService {
     
         return user;
     } 
+
+    async ensureUserIsActive(user: User) {
+      if (user.status === 'INACTIVE') {
+        throw new BadRequestException('User is already inactive');
+      }
+    }
 }
