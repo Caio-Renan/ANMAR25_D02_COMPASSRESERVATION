@@ -1,6 +1,5 @@
 import {
   Injectable,
-  ConflictException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Prisma, Client } from '@prisma/client';
@@ -55,7 +54,7 @@ export class ClientsService {
       }
     );
 
-    const validationUrl = `${process.env.APP_URL}/auth/verify-email??token=${token}`
+    const validationUrl = `${process.env.APP_URL}/api/v1/verify-email?token=${token}`
 
     await this.emailService.sendEmailVerification(client.email, client.name, validationUrl)
 
@@ -119,5 +118,27 @@ export class ClientsService {
       },
       select: clientSelect,
     });
+  }
+
+  async validateMail(id: number){
+
+    await this.validationService.verifiedEmail(id);
+
+    const client = await this.validationService.getClientOrFail(id);
+    
+    const token = this.jwtService.sign(
+      { id: client.id },
+      {
+        expiresIn: '1h',
+        subject: String(client.id),
+        issuer: 'email-verification',
+        audience: 'clients',
+      }
+    );
+    console.log("Generated JWT Token:", token);
+
+    const validationUrl = `${process.env.APP_URL}/api/v1/verify-email?token=${token}`
+
+    await this.emailService.sendEmailVerification(client.email, client.name, validationUrl)
   }
 }
