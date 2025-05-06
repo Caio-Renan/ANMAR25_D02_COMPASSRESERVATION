@@ -71,7 +71,7 @@ export class ClientsService {
   }
 
   async update(id: number, dto: UpdateClientDto): Promise<Client> {
-    const client = await this.checkIfClientExists(id);
+    const client = await this.getClientOrFail(id);
 
     if (dto.email && dto.email !== client.email) {
       const emailExists = await this.prisma.client.findUnique({ where: { email: dto.email } });
@@ -124,11 +124,11 @@ export class ClientsService {
   }
 
   async findById(id: number) {
-    return this.checkIfClientExists(id, clientSelect);
+    return this.getClientOrFail(id, clientSelect);
   }
 
   async softDelete(id: number) {
-    const client = await this.checkIfClientExists(id);
+    const client = await this.getClientOrFail(id);
 
     if (client.status === 'INACTIVE') {
       throw new ConflictException('Client already INACTIVE');
@@ -144,7 +144,7 @@ export class ClientsService {
     });
   }
 
-  async checkIfClientExists(id: number, select?: Prisma.ClientSelect): Promise<Client> {
+  async getClientOrFail(id: number, select?: Prisma.ClientSelect): Promise<Client> {
     const client = await this.prisma.client.findUnique({ where: { id }, select });
 
     if (!client) throw new NotFoundException('Client not found');
