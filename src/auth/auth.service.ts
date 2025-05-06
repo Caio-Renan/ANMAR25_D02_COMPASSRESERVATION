@@ -9,7 +9,6 @@ import { AuthForgetDto } from "./dto/auth-forget.dto";
 import { User } from "@prisma/client";
 import { EmailService } from "src/email/email.service";
 import { AuthResetDto } from "./dto/auth-reset.dto";
-import { AuthVerifyEmailDto } from "./dto/auth-verify-email.dto";
 import { AuthValidateService } from "./authValidate.service";
 
 
@@ -117,8 +116,8 @@ export class AuthService {
 
      }
 
-     async verifyEmail(dto: AuthVerifyEmailDto){
-          const payload = this.jwtService.verify(dto.token, {
+     async verifyEmail(token: string){
+          const payload = this.jwtService.verify(token, {
                issuer: 'email-verification',
                audience: 'clients',
           });
