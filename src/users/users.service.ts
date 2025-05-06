@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, BadRequestException, ConflictException, ForbiddenException } from '@nestjs/common';
-import { CreateUserDTO } from './dto/create-user.dto';
-import { UpdateUserDTO } from './dto/update-user.dto'
-import { FilterUserDTO } from './dto/filter-user.dto'
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto'
+import { FilterUserDto } from './dto/filter-user.dto'
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Prisma, User } from '@prisma/client';
@@ -22,7 +22,7 @@ const userSelectWithoutPassword: Prisma.UserSelect = {
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(dto: CreateUserDTO) {
+  async create(dto: CreateUserDto) {
     const existingEmail = await this.prisma.user.findUnique({
       where: { email: dto.email },
     });
@@ -46,7 +46,7 @@ export class UsersService {
     });
   }
 
-  async update(id: number, dto: UpdateUserDTO, user: any) {
+  async update(id: number, dto: UpdateUserDto, user: any) {
     if (user.role !== 'ADMIN' && user.id !== id) {
       throw new ForbiddenException('You do not have permission to update this user');
     }
@@ -83,7 +83,7 @@ export class UsersService {
     });
   }
 
-  async findAll(filter: FilterUserDTO) {
+  async findAll(filter: FilterUserDto) {
     const page = parseInt(filter.page?.toString() || '1', 10);
     const limit = parseInt(filter.limit?.toString() || '10', 10);
 
