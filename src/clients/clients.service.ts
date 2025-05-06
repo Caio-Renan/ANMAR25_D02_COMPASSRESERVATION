@@ -34,14 +34,7 @@ export class ClientsService {
   ) { }
 
   async create(dto: CreateClientDto, userId: number): Promise<Client> {
-    const existingCpf = await this.prisma.client.findUnique({ where: { cpf: dto.cpf } });
-    if (existingCpf) throw new ConflictException('CPF already registered');
-
-    const existingEmail = await this.prisma.client.findUnique({ where: { email: dto.email } });
-    if (existingEmail) throw new ConflictException('Email already registered');
-
-    const existingPhone = await this.prisma.client.findUnique({ where: { phone: dto.phone } });
-    if (existingPhone) throw new ConflictException('Phone already registered');
+    await this.validateClientFields(dto);
 
     const client = await this.prisma.client.create({
       data: {
@@ -71,22 +64,8 @@ export class ClientsService {
   }
 
   async update(id: number, dto: UpdateClientDto): Promise<Client> {
-    const client = await this.getClientOrFail(id);
 
-    if (dto.email && dto.email !== client.email) {
-      const emailExists = await this.prisma.client.findUnique({ where: { email: dto.email } });
-      if (emailExists) throw new ConflictException('Email already registered');
-    }
-
-    if (dto.phone && dto.phone !== client.phone) {
-      const phoneExists = await this.prisma.client.findUnique({ where: { phone: dto.phone } });
-      if (phoneExists) throw new ConflictException('Phone already registered');
-    }
-
-    if (dto.cpf && dto.cpf !== client.cpf) {
-      const cpfExists = await this.prisma.client.findUnique({ where: { cpf: dto.cpf } });
-      if (cpfExists) throw new ConflictException('CPF already registered');
-    }
+    await this.validateClientFields(dto);
 
     return this.prisma.client.update({
       where: { id },
@@ -142,6 +121,23 @@ export class ClientsService {
       },
       select: clientSelect,
     });
+  }
+
+  async validateClientFields(dto: UpdateClientDto) {
+    if (dto.email) {
+      const emailExists = await this.prisma.client.findUnique({ where: { email: dto.email } });
+      if (emailExists) throw new ConflictException('Email already registered');
+    }
+
+    if (dto.phone) {
+      const phoneExists = await this.prisma.client.findUnique({ where: { phone: dto.phone } });
+      if (phoneExists) throw new ConflictException('Phone already registered');
+    }
+
+    if (dto.cpf) {
+      const cpfExists = await this.prisma.client.findUnique({ where: { cpf: dto.cpf } });
+      if (cpfExists) throw new ConflictException('CPF already registered');
+    }
   }
 
   async getClientOrFail(id: number, select?: Prisma.ClientSelect): Promise<Client> {
