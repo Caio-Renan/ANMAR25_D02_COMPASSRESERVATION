@@ -24,16 +24,12 @@ export class ReservationValidationService {
   async isResourceActiveAndEnough(
     resources: CreateReservationResourceDto[],
   ): Promise<boolean> {
-    console.log('Na função isResourceActiveAndEnough: ', resources);
 
     for (const { resourceId, quantity } of resources) {
-      console.log('No for :', resources);
 
       const resource = await this.prisma.resource.findUnique({
         where: { id: resourceId },
       });
-
-      console.log('Resultado da busca: ', resource);
 
       if (!resource || resource.status === 'INACTIVE') {
         throw new NotFoundException(
