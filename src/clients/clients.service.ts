@@ -71,7 +71,6 @@ export class ClientsService {
   }
 
   async update(id: number, dto: UpdateClientDto): Promise<Client> {
-    await this.isIdValueCorrect(id);
     const client = await this.checkIfClientExists(id);
 
     if (dto.email && dto.email !== client.email) {
@@ -125,12 +124,10 @@ export class ClientsService {
   }
 
   async findById(id: number) {
-    await this.isIdValueCorrect(id);
     return this.checkIfClientExists(id, clientSelect);
   }
 
   async softDelete(id: number) {
-    await this.isIdValueCorrect(id);
     const client = await this.checkIfClientExists(id);
 
     if (client.status === 'INACTIVE') {
@@ -145,11 +142,6 @@ export class ClientsService {
       },
       select: clientSelect,
     });
-  }
-
-  async isIdValueCorrect(id: number) {
-    if (Number.isNaN(id)) throw new BadRequestException('ID must be a number');
-    if (id < 1) throw new BadRequestException('ID must be at least 1');
   }
 
   async checkIfClientExists(id: number, select?: Prisma.ClientSelect): Promise<Client> {
