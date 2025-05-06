@@ -22,7 +22,7 @@ The API provides full **CRUD** functionality and business rules for the followin
 
 - [Endpoints](#endpoints)
 - [Authentication](#authentication)
-
+- [Email configuration](#email-configuration-with-ethereal)
 
 ## 💻 Technologies
 
@@ -49,19 +49,20 @@ Create a `.env` file in the project root with the following settings:
 
 ```env
 DATABASE_URL="file:./compass_reservation.db"
-
+DEFAULT_USER_NAME=user
 APP_URL=http://localhost:3000
 PORT=3000
-
-DEFAULT_USER_NAME=user
 DEFAULT_USER_EMAIL=user@gmail.com
 DEFAULT_USER_PASSWORD=Us3r@1234
 DEFAULT_USER_PHONE=+55 (81) 99999-9999
-
 NODE_ENV=development
 
-MAIL_USER=teste@gmail.com
-MAIL_PASS=teste
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_SECURE=false
+MAIL_USER=seuemail@gmail.com
+MAIL_PASS=suaSenha
+
 EMAIL_ENABLED=true
 
 JWT_SECRET=mysecretkey
@@ -132,14 +133,14 @@ Access the `/api` endpoint after starting the server to view the API documentati
 - `GET /api/v1/users/:id` - Get a single user by ID
 - `DELETE /api/v1/users/:id` - Delete a user
 
-## Reservations
+## Clients
 
-- `POST /api/v1/reservations` - Create a new reservation
-- `GET /api/v1/reservations` - Get list of reservations
-- `GET /api/v1/reservations/:id` - Get reservation by ID
-- `PATCH /api/v1/reservations/:id` - Update a reservation
-- `DELETE /api/v1/reservations/:id` - Delete a reservation
-
+- `POST /api/v1/clients` - Create a new client
+- `PATCH /api/v1/clients/:id` - Update client information
+- `GET /api/v1/clients` - Get list of clients
+- `GET /api/v1/clients/:id` - Get client by ID
+- `DELETE /api/v1/clients/:id` - Delete a client
+  
 ## Spaces
 
 - `POST /api/v1/spaces` - Create a new space
@@ -156,14 +157,13 @@ Access the `/api` endpoint after starting the server to view the API documentati
 - `PATCH /api/v1/resources/:id` - Update a resource
 - `DELETE /api/v1/resources/:id` - Delete a resource
 
-## Clients
+## Reservations
 
-- `POST /api/v1/clients` - Create a new client
-- `PATCH /api/v1/clients/:id` - Update client information
-- `GET /api/v1/clients` - Get list of clients
-- `GET /api/v1/clients/:id` - Get client by ID
-- `DELETE /api/v1/clients/:id` - Delete a client
-
+- `POST /api/v1/reservations` - Create a new reservation
+- `GET /api/v1/reservations` - Get list of reservations
+- `GET /api/v1/reservations/:id` - Get reservation by ID
+- `PATCH /api/v1/reservations/:id` - Update a reservation
+- `DELETE /api/v1/reservations/:id` - Delete a reservation
 
 
 ## 📁 Folder Structure
@@ -252,6 +252,25 @@ After configuring the `Authorization` with the Bearer Token, your requests to pr
 * **Users with the `ADMIN` role:** Will have access to all API functionalities, including administrative routes. The token returned for the default administrator credentials (`DEFAULT_ADMIN_EMAIL`) will contain the `ADMIN` role.
 
 Make sure to store the token securely in your development environment or client application.
+
+# Email Configuration with Ethereal
+
+1. Go to [Ethereal](https://ethereal.email/) and create an account.
+2. Copy the generated email and password from the website.
+3. In your project, edit the `.env` file with the following variables:
+
+```env
+MAIL_HOST=smtp.ethereal.email
+MAIL_PORT=587
+MAIL_USER=your-generated-email@ethereal.email
+MAIL_PASSWORD=your-generated-password
+```
+
+4. Go back to the Ethereal control panel and click on Open Mailbox to view sent and received emails.
+5. Now, your project is ready to recive emails!
+
+> This setup should give clear guidance on how to configure email sending and receiving in your project using Ethereal!
+
 
 ## 🤝 Contribution
 
