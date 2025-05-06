@@ -51,7 +51,7 @@ export class UsersService {
       throw new ForbiddenException('You do not have permission to update this user');
     }
   
-    const existingUser = await this.checkIfUserExists(id);
+    const existingUser = await this.findClientOrThrow(id);
   
     if (dto.email && dto.email !== existingUser.email) {
       const emailExists = await this.prisma.user.findUnique({
@@ -116,12 +116,12 @@ export class UsersService {
   }
 
   async findOne(id: number) {
-    const user = await this.checkIfUserExists(id, userSelectWithoutPassword);
+    const user = await this.findClientOrThrow(id, userSelectWithoutPassword);
     return user;
   }
 
   async softDelete(id: number) {
-    const user = await this.checkIfUserExists(id);
+    const user = await this.findClientOrThrow(id);
 
     if(user.status === "INACTIVE") { throw new ConflictException("user is already INACTIVE") };
 
@@ -134,7 +134,7 @@ export class UsersService {
     });
   }
 
-  async checkIfUserExists(id: number, select?: Prisma.UserSelect): Promise<User> {
+  async findClientOrThrow(id: number, select?: Prisma.UserSelect): Promise<User> {
     const user = await this.prisma.user.findUnique({
       where: { id }, select: select
     });
