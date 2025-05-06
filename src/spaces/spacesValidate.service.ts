@@ -31,4 +31,14 @@ export class SpaceValidationService {
           throw new BadRequestException('Space is already inactive');
         }
       }
+      
+      async validateNoBookings(prisma: PrismaService, id: number) {
+        const bookings = await prisma.reservation.findMany({
+          where: { spaceId: id },
+        });
+      
+        if (bookings.length > 0) {
+          throw new ConflictException('Cannot delete space with existing bookings');
+        }
+      }
 }
